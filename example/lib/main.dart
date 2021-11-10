@@ -76,10 +76,15 @@ class _HomePageState extends State<HomePage> {
         "In App: App Discount",
         "In App: App Promo",
         "Get Tags",
+        "Set Tag Text",
         "Set Tags",
+        "Remove Tag Text",
         "Remove Tag",
+        "Set Attribute Text",
         "Set Attribute",
+        "Get Attribute Text",
         "Get Attribute",
+        "Remove Attribute Text",
         "Remove Attribute",
         "Remove Badge Number",
         "Lock Orientation",
@@ -119,6 +124,41 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Enter alias'),
+          ),
+        );
+      case 15:
+        return Card(
+          child: TextFormField(
+            decoration: const InputDecoration(
+                border: UnderlineInputBorder(), labelText: 'Set tag'),
+          ),
+        );
+      case 17:
+        return Card(
+          child: TextFormField(
+            decoration: const InputDecoration(
+                border: UnderlineInputBorder(), labelText: 'Remove tag'),
+          ),
+        );
+      case 19:
+        return Card(
+          child: TextFormField(
+            decoration: const InputDecoration(
+                border: UnderlineInputBorder(), labelText: 'Set Attribute'),
+          ),
+        );
+      case 21:
+        return Card(
+          child: TextFormField(
+            decoration: const InputDecoration(
+                border: UnderlineInputBorder(), labelText: 'Get attribute'),
+          ),
+        );
+      case 23:
+        return Card(
+          child: TextFormField(
+            decoration: const InputDecoration(
+                border: UnderlineInputBorder(), labelText: 'Remove attribute'),
           ),
         );
       default:
