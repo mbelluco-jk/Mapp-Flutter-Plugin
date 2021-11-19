@@ -1,0 +1,1 @@
+enum SERVER { L3, EMC, EMC_US, CROC, TEST, TEST55 }

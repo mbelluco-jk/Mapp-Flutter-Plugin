@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:mapp_sdk/mapp_sdk.dart';
+import 'package:mapp_sdk/helper_classes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -167,9 +168,17 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Theme.of(context).primaryColor),
               textAlign: TextAlign.center,
             ),
-            onTap: () {},
+            onTap: () {
+              onTap(index);
+            },
           ),
         );
+    }
+  }
+
+  void onTap(int index) {
+    if (_screens[index] == "Engage") {
+      MappSdk.engage(SERVER.TEST);
     }
   }
 
