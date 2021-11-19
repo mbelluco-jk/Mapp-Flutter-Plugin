@@ -3,8 +3,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-class PluginCodelab {
-  static const MethodChannel _channel = MethodChannel('plugin_codelab');
+class MappSdk {
+  static const MethodChannel _channel = MethodChannel('mapp_sdk');
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');

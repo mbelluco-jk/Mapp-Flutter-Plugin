@@ -1,11 +1,11 @@
-#import "PluginCodelabPlugin.h"
+#import "MappSdkPlugin.h"
 
-@implementation PluginCodelabPlugin
+@implementation MappSdkPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FlutterMethodChannel* channel = [FlutterMethodChannel
-      methodChannelWithName:@"plugin_codelab"
+      methodChannelWithName:@"mapp_sdk"
             binaryMessenger:[registrar messenger]];
-  PluginCodelabPlugin* instance = [[PluginCodelabPlugin alloc] init];
+  MappSdkPlugin* instance = [[MappSdkPlugin alloc] init];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
 

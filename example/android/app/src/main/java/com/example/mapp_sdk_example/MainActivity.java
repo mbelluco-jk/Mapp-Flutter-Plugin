@@ -1,4 +1,4 @@
-package com.example.plugin_codelab_example;
+package com.example.mapp_sdk_example;
 
 import io.flutter.embedding.android.FlutterActivity;
 

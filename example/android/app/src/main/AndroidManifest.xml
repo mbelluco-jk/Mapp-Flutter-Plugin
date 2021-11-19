@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.plugin_codelab_example">
+    package="com.example.mapp_sdk_example">
    <application
-        android:label="plugin_codelab_example"
+        android:label="mapp_sdk_example"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

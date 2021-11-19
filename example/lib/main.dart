@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:plugin_codelab/plugin_codelab.dart';
-
-//import '../../lib/plugin_codelab.dart';
+import 'package:mapp_sdk/mapp_sdk.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,7 +46,7 @@ class _HomePageState extends State<HomePage> {
     String? platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await PluginCodelab.platformVersion;
+      platformVersion = await MappSdk.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }

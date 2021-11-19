@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plugin_codelab/plugin_codelab.dart';
+import 'package:mapp_sdk/mapp_sdk.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('plugin_codelab');
+  const MethodChannel channel = MethodChannel('mapp_sdk');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -18,6 +18,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await PluginCodelab.platformVersion, '42');
+    expect(await MappSdk.platformVersion, '42');
   });
 }

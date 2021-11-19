@@ -1,6 +1,6 @@
-# plugin_codelab_example
+# mapp_sdk_example
 
-Demonstrates how to use the mapp sdk plugin.
+Demonstrates how to use the mapp_sdk plugin.
 
 ## Getting Started
 
