@@ -11,7 +11,8 @@ class MappSdk {
     return version;
   }
 
-  static Future<String?> engage(SERVER server) async {
+  static Future<String?> engage(String sdkKey, String googleProjectId,
+      SERVER server, String appID, String tenantID) async {
     final String? version =
         await _channel.invokeMethod('engage', [server.index]);
     return 'successfull $version engage method invoked';
@@ -35,7 +36,7 @@ class MappSdk {
     return version;
   }
 
-  static Future<String?> optIn(bool optIn) async {
+  static Future<String?> setPushEnabled(bool optIn) async {
     final String? version = await _channel.invokeMethod('optIn', [optIn]);
     return 'successfull $version opted in device with value $optIn';
   }
@@ -45,24 +46,24 @@ class MappSdk {
     return version;
   }
 
-  static Future<String?> logoutWithOptin(bool status) async {
+  static Future<String?> logOut(bool pushEnabled) async {
     final String? version =
-        await _channel.invokeMethod('logoutWithOptin', [status]);
-    return 'successfull $version logged out with status $status';
+        await _channel.invokeMethod('logoutWithOptin', [pushEnabled]);
+    return 'successfull $version logged out with status $pushEnabled';
   }
 
-  static Future<String?> setDeviceAlias(String alias) async {
+  static Future<String?> setAlias(String alias) async {
     final String? version =
         await _channel.invokeMethod('setDeviceAlias', [alias]);
     return 'successfull $version set new alias $alias';
   }
 
-  static Future<String?> getDeviceAlias() async {
+  static Future<String?> getAlias() async {
     final String alias = await _channel.invokeMethod('getDeviceAlias');
     return alias;
   }
 
-  static Future<List<String>?> fetchDeviceTags() async {
+  static Future<List<String>?> getTags() async {
     final List<String> tags = await _channel.invokeMethod('fetchDeviceTags');
     return tags;
   }
@@ -73,13 +74,13 @@ class MappSdk {
     return tags;
   }
 
-  static Future<String?> addTagsToDevice(List<String> tags) async {
+  static Future<String?> addTags(List<String> tags) async {
     final String version =
         await _channel.invokeMethod('addTagsToDevice', [tags]);
     return "Tags are added successfully! $version";
   }
 
-  static Future<String?> removeTagsFromDevice(List<String> tags) async {
+  static Future<String?> removeTags(List<String> tags) async {
     final String version =
         await _channel.invokeMethod('removeTagsFromDevice', [tags]);
     return "Tags are removed successfully! $version";
@@ -91,19 +92,19 @@ class MappSdk {
     return "Date $date added successfully! $version";
   }
 
-  static Future<String?> setNumberValueWithKey(int number, String key) async {
+  static Future<String?> setAttributeInt(String key, int value) async {
     final String version =
-        await _channel.invokeMethod('setNumberValueWithKey', [number, key]);
-    return "Number $number added successfully! $version";
+        await _channel.invokeMethod('setNumberValueWithKey', [value, key]);
+    return "Number $value added successfully! $version";
   }
 
-  static Future<String?> incrementNumericKey(int number, String key) async {
+  static Future<String?> incrementNumericKey(String key, int value) async {
     final String version =
-        await _channel.invokeMethod('incrementNumericKey', [number, key]);
-    return "Number $number incremented successfully! $version";
+        await _channel.invokeMethod('incrementNumericKey', [value, key]);
+    return "Number $value incremented successfully! $version";
   }
 
-  static Future<String?> setStringValueWithKey(String value, String key) async {
+  static Future<String?> setAttributeString(String key, String value) async {
     final String version =
         await _channel.invokeMethod('setStringValueWithKey', [value, key]);
     return "String $value added successfully! $version";
@@ -117,6 +118,11 @@ class MappSdk {
 
   static Future<String?> getDeviceInfo() async {
     final String deviceInfo = await _channel.invokeMethod('getDeviceInfo');
+    return deviceInfo;
+  }
+
+  static Future<String?> removeBadgeNumber() async {
+    final String deviceInfo = await _channel.invokeMethod('removeBadgeNumber');
     return deviceInfo;
   }
 }

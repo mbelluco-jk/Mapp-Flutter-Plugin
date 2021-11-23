@@ -14,7 +14,7 @@
   if ([@"getPlatformVersion" isEqualToString:call.method]) {
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"engage" isEqualToString:call.method]){
-    NSNumber* severNumber = call.arguments[0];
+    NSNumber* severNumber = call.arguments[2];
     [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:NULL with:severNumber];
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     BOOL value = call.arguments[0];
@@ -77,16 +77,16 @@
     NSString* key = call.arguments[1];
     [[Appoxee shared] setDateValue:date forKey:key withCompletionHandler:NULL];
   } else if ([@"setNumberValueWithKey" isEqualToString:call.method]){
-    NSNumber* number = call.arguments[0];
-    NSString* key = call.arguments[1];
+    NSNumber* number = call.arguments[1];
+    NSString* key = call.arguments[0];
     [[Appoxee shared] setNumberValue:number forKey:key withCompletionHandler:NULL];
   } else if ([@"incrementNumericKey" isEqualToString:call.method]){
-    NSNumber* number = call.arguments[0];
-    NSString* key = call.arguments[1];
+    NSNumber* number = call.arguments[1];
+    NSString* key = call.arguments[0];
     [[Appoxee shared] incrementNumericKey:key byNumericValue:number withCompletionHandler:NULL];
   } else if ([@"setStringValueWithKey" isEqualToString:call.method]){
-    NSString* stringValue = call.arguments[0];
-    NSString* key = call.arguments[1];
+    NSString* stringValue = call.arguments[1];
+    NSString* key = call.arguments[0];
     [[Appoxee shared] setStringValue:stringValue forKey:key withCompletionHandler:NULL];
   } else if ([@"fetchCustomFieldByKey" isEqualToString:call.method]){
     NSString* key = call.arguments[0];
@@ -97,6 +97,10 @@
         // If there wan't an error, and data object is nil, then value doesn't exist on the device.
         }
     }];
+  } else if ([@"getDeviceInfo" isEqualToString:call.method]){
+    result([[[Appoxee shared] deviceInfo] description]);
+  } else if ([@"removeBadgeNumber" isEqualToString:call.method]){
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
   } else {
     result(FlutterMethodNotImplemented);
   }
