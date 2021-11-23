@@ -34,6 +34,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? _platformVersion = 'Unknown';
+  String? _aliasToSetString = '';
   List<String> _screens = [];
 
   @override
@@ -93,29 +94,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _determineWidget(int index) {
-    // switch (index) {
-    //   case 0:
-    //     return DetailsView(index);
-    //   case 1:
-    //     return PageTracking();
-    //   case 2:
-    //     return ActionTracking();
-    //   case 3:
-    //     return Campaign();
-    //   case 4:
-    //     return Ecommerce();
-    //   case 5:
-    //     return WebviewApp();
-    //   case 6:
-    //     return WebviewForAndroid();
-    //   case 7:
-    //     return Media();
-    //   default:
-    //     return DetailsView(index);
-    // }
-  }
-
   Card _createTextFieldOrButton(int index) {
     switch (index) {
       case 0:
@@ -123,6 +101,9 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Enter alias'),
+            onSaved: (String? value) {
+              _aliasToSetString = value;
+            },
           ),
         );
       case 15:
@@ -178,7 +159,8 @@ class _HomePageState extends State<HomePage> {
 
   void onTap(int index) {
     if (_screens[index] == "Engage") {
-      MappSdk.engage(SERVER.TEST);
+      MappSdk.engage(
+          "sdk key", "google projec id", SERVER.TEST, "app id", "tennant id");
     }
   }
 
