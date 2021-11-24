@@ -13,8 +13,8 @@ class MappSdk {
 
   static Future<String?> engage(String sdkKey, String googleProjectId,
       SERVER server, String appID, String tenantID) async {
-    final String? version =
-        await _channel.invokeMethod('engage', [server.index]);
+    final String? version = await _channel.invokeMethod(
+        'engage', [sdkKey, googleProjectId, server.index, appID, tenantID]);
     return 'successfull $version engage method invoked';
   }
 
