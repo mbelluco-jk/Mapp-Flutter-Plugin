@@ -94,6 +94,34 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _showMyDialog(String title, String subtitle, String text) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(subtitle),
+                Text(text),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Card _createTextFieldOrButton(int index) {
     switch (index) {
       case 0:
@@ -161,6 +189,23 @@ class _HomePageState extends State<HomePage> {
     if (_screens[index] == "Engage") {
       MappSdk.engage(
           "sdk key", "google projec id", SERVER.TEST, "app id", "tennant id");
+    } else if (_screens[index] == "Set Device Alias") {
+      if (_aliasToSetString != null) {
+        MappSdk.setAlias(_aliasToSetString!);
+      }
+    } else if (_screens[index] == "Get Device Alias") {
+      MappSdk.getAlias().then(
+          (String value) => {_showMyDialog("Show Alias", "Alias:", value)});
+    } else if (_screens[index] == "Device Information") {
+      MappSdk.getDeviceInfo().then((String value) =>
+          {_showMyDialog("Show Device Information", "", value)});
+    } else if (_screens[index] == "Is Push Enabled") {
+      MappSdk.isPushEnabled().then((bool value) =>
+          {_showMyDialog("Show Device Information", "", value ? "YES" : "NO")});
+    } else if (_screens[index] == "Opt in") {
+      MappSdk.setPushEnabled(true);
+    } else if (_screens[index] == "Opt out") {
+      MappSdk.setPushEnabled(false);
     }
   }
 

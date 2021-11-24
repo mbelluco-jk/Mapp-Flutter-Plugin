@@ -58,7 +58,7 @@ class MappSdk {
     return 'successfull $version set new alias $alias';
   }
 
-  static Future<String?> getAlias() async {
+  static Future<String> getAlias() async {
     final String alias = await _channel.invokeMethod('getDeviceAlias');
     return alias;
   }
@@ -116,7 +116,7 @@ class MappSdk {
     return fieldValue;
   }
 
-  static Future<String?> getDeviceInfo() async {
+  static Future<String> getDeviceInfo() async {
     final String deviceInfo = await _channel.invokeMethod('getDeviceInfo');
     return deviceInfo;
   }

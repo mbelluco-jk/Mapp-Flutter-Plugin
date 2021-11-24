@@ -23,7 +23,7 @@
     BOOL value = call.arguments[0];
     [[Appoxee shared] setShowNotificationsOnForeground:value];
   } else if ([@"isReady" isEqualToString:call.method]) {
-    result([[Appoxee shared] isReady]);
+    result([[Appoxee shared] isReady] ? @YES : @NO);
   } else if ([@"optIn" isEqualToString:call.method]){
     BOOL value = call.arguments[0];
     [[Appoxee shared] disablePushNotifications:!value withCompletionHandler:NULL];
@@ -31,9 +31,9 @@
     [[Appoxee shared] isPushEnabled:^(NSError * _Nullable appoxeeError, id  _Nullable data) {
         if (!appoxeeError) {
             BOOL state = [(NSNumber *)data boolValue];
-            result(state);
+            result((NSNumber *)data);
         } else {
-          result(false);
+          result(@NO);
         }
     }];
   } else if ([@"logoutWithOptin" isEqualToString:call.method]){
@@ -98,12 +98,26 @@
         }
     }];
   } else if ([@"getDeviceInfo" isEqualToString:call.method]){
-    result([[[Appoxee shared] deviceInfo] description]);
+    APXClientDevice* device = [[Appoxee shared] deviceInfo];
+    NSDictionary *deviceData = [self deviceInfo:device];
+    result([deviceData description]);
   } else if ([@"removeBadgeNumber" isEqualToString:call.method]){
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
   } else {
     result(FlutterMethodNotImplemented);
   }
+}
+
+- (NSDictionary *) deviceInfo: (APXClientDevice *) device {
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setObject: device.udid forKey:@"udid"];
+    [dict setObject: device.sdkVersion forKey:@"sdkVersion"];
+    [dict setObject:device.locale forKey:@"locale"];
+    [dict setObject:device.timeZone forKey:@"timezone"];
+    [dict setObject:device.hardwearType forKey:@"deviceModel"];
+    [dict setObject:device.osVersion forKey:@"osVersion"];
+    [dict setObject:device.osName forKey:@"osName"];
+    return dict;
 }
 
 @end
