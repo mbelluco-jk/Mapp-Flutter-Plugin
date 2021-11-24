@@ -103,6 +103,12 @@
     result([deviceData description]);
   } else if ([@"removeBadgeNumber" isEqualToString:call.method]){
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+  } else if ([@"addTagsToDevice" isEqualToString:call.method]){
+    NSArray<NSString *> * array = call.arguments[0];
+    [[Appoxee shared] addTagsToDevice:array withCompletionHandler:NULL];
+  } else if ([@"removeTagsFromDevice" isEqualToString:call.method]){
+    NSArray<NSString *> * array = call.arguments[0];
+    [[Appoxee shared] removeTagsFromDevice:array withCompletionHandler:NULL];
   } else {
     result(FlutterMethodNotImplemented);
   }
