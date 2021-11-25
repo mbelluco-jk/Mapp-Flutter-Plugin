@@ -35,6 +35,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? _platformVersion = 'Unknown';
   String? _aliasToSetString = '';
+  String? _tagToSetString = '';
+  String? _tagToRemoveString = '';
+  String? _stringToSetString = '';
+  String? _stringToRemoveString = '';
+
   List<String> _screens = [];
 
   @override
@@ -84,8 +89,6 @@ class _HomePageState extends State<HomePage> {
         "Set Attribute",
         "Get Attribute Text",
         "Get Attribute",
-        "Remove Attribute Text",
-        "Remove Attribute",
         "Remove Badge Number",
         "Lock Orientation",
         "Engage",
@@ -139,6 +142,9 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Set tag'),
+            onSaved: (String? value) {
+              _tagToSetString = value;
+            },
           ),
         );
       case 17:
@@ -146,6 +152,9 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Remove tag'),
+            onSaved: (String? value) {
+              _tagToRemoveString = value;
+            },
           ),
         );
       case 19:
@@ -153,6 +162,9 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Set Attribute'),
+            onSaved: (String? value) {
+              _stringToSetString = value;
+            },
           ),
         );
       case 21:
@@ -167,6 +179,9 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Remove attribute'),
+            onSaved: (String? value) {
+              _stringToRemoveString = value;
+            },
           ),
         );
       default:
@@ -206,6 +221,18 @@ class _HomePageState extends State<HomePage> {
       MappSdk.setPushEnabled(true);
     } else if (_screens[index] == "Opt out") {
       MappSdk.setPushEnabled(false);
+    } else if (_screens[index] == "Set Tags") {
+      List<String> tags = [_tagToSetString!];
+      MappSdk.addTags(tags);
+    } else if (_screens[index] == "Remove Tag") {
+      List<String> tags = [_tagToRemoveString!];
+      MappSdk.removeTags(tags);
+    } else if (_screens[index] == "Set Attribute") {
+      MappSdk.setAttributeString("stringKey", _stringToSetString!);
+    } else if (_screens[index] == "Remove Badge Number") {
+      MappSdk.removeBadgeNumber();
+    } else if (_screens[index] == "Log out") {
+      MappSdk.logOut(false);
     }
   }
 

@@ -67,10 +67,10 @@
         }
     }];
   } else if ([@"addTagsToDevice" isEqualToString:call.method]){
-    NSArray* tags = call.arguments[0];
+    NSArray<NSString *> * array = call.arguments[0];
     [[Appoxee shared] addTagsToDevice:tags withCompletionHandler:NULL];
   } else if ([@"removeTagsFromDevice" isEqualToString:call.method]){
-    NSArray* tags = call.arguments[0];
+    NSArray<NSString *> * array = call.arguments[0];
     [[Appoxee shared] removeTagsFromDevice:tags withCompletionHandler:NULL];
   } else if ([@"setDateValueWithKey" isEqualToString:call.method]){
     NSDate* date = call.arguments[0];
