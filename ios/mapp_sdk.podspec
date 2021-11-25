@@ -17,6 +17,7 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.dependency 'MappSDK', '6.0.5'
+  s.dependency 'MappSDKInapp', '6.0.5'
   s.platform = :ios, '10.0'
 
 
