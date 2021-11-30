@@ -125,4 +125,22 @@ class MappSdk {
     final String deviceInfo = await _channel.invokeMethod('removeBadgeNumber');
     return deviceInfo;
   }
+
+  //InApp methods
+  static Future<String?> triggerInApp(String value) async {
+    final String returnValue =
+        await _channel.invokeMethod('triggerInApp', [value]);
+    return returnValue;
+  }
+
+  static Future<String?> showWebView() async {
+    final String returnValue = await _channel.invokeMethod('showWebView');
+    return returnValue;
+  }
+
+  static Future<String?> showWebViewNbaPlayer() async {
+    final String returnValue = await _channel.invokeMethod('triggerWebview');
+    print("play will be displayed");
+    return returnValue;
+  }
 }

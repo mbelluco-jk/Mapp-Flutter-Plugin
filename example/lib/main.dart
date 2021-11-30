@@ -233,6 +233,11 @@ class _HomePageState extends State<HomePage> {
       MappSdk.removeBadgeNumber();
     } else if (_screens[index] == "Log out") {
       MappSdk.logOut(false);
+    } else if (_screens[index] == "In App: App Open") {
+      MappSdk.triggerInApp("app_open");
+    } else if (_screens[index] == "In App: App Feedback") {
+      //MappSdk.showWebView();
+      MappSdk.showWebViewNbaPlayer();
     }
   }
 

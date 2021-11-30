@@ -1,5 +1,11 @@
 #import "MappSdkPlugin.h"
 #import <AppoxeeSDK.h>
+#import <AppoxeeInappSDK.h>
+#import <WebKit/WebKit.h>
+
+@interface MappSdkPlugin ()
+@property WKWebView* webView;
+@end
 
 @implementation MappSdkPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -15,7 +21,8 @@
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"engage" isEqualToString:call.method]){
     NSNumber* severNumber = call.arguments[2];
-    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:NULL with:severNumber];
+    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:NULL with:TEST];
+    [[AppoxeeInapp shared] engageWithDelegate:NULL with:tEST];
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     BOOL value = call.arguments[0];
     [[Appoxee shared] setPostponeNotificationRequest:value];
@@ -109,6 +116,20 @@
   } else if ([@"removeTagsFromDevice" isEqualToString:call.method]){
     NSArray<NSString *> * array = call.arguments[0];
     [[Appoxee shared] removeTagsFromDevice:array withCompletionHandler:NULL];
+  } else if ([@"triggerInApp" isEqualToString:call.method]){
+    NSString * eventName = call.arguments[0];
+    [[AppoxeeInapp shared]reportInteractionEventWithName: eventName andAttributes:NULL];
+  } else if ([@"showWebView" isEqualToString:call.method]){
+    WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
+        UIViewController* base = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+        UIViewController* topViewController = [self topViewController:base];
+        
+        if(topViewController) {
+            self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, 500, 500) configuration:configuration];
+            [[topViewController view] addSubview:self.webView];
+            NSURLRequest* request = [[NSURLRequest alloc] initWithURL:[[NSURL alloc] initWithString:@"https://www.google.com"]];
+            [self.webView loadRequest:request];
+        }
   } else {
     result(FlutterMethodNotImplemented);
   }
@@ -124,6 +145,25 @@
     [dict setObject:device.osVersion forKey:@"osVersion"];
     [dict setObject:device.osName forKey:@"osName"];
     return dict;
+}
+
+-(UIViewController* ) topViewController: (UIViewController* ) base {
+    if ([base isKindOfClass:UINavigationController.class]) {
+        UINavigationController* nav  = (UINavigationController*) base;
+        return [self topViewController:[nav visibleViewController]];
+    }
+    if ([base isKindOfClass:UITabBarController.class]) {
+        UITabBarController* tab = (UITabBarController*) base;
+        UIViewController* selected = [tab selectedViewController];
+        if (selected) {
+            return [self topViewController:selected];
+        }
+    }
+    UIViewController* presented = [base presentedViewController];
+    if (presented) {
+        return [self topViewController:presented];
+    }
+    return base;
 }
 
 @end
