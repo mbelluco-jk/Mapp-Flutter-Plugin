@@ -4,7 +4,34 @@ import 'package:flutter/services.dart';
 import 'helper_classes.dart';
 
 class MappSdk {
-  static const MethodChannel _channel = MethodChannel('mapp_sdk');
+  //static const MethodChannel _channel = MethodChannel('mapp_sdk');
+
+  static MethodChannel _privateChannel = const MethodChannel('mapp_sdk');
+
+  static MethodChannel get _channel {
+    if (_privateChannel == null) {
+      _privateChannel = const MethodChannel('mapp_sdk');
+    }
+    _privateChannel!.setMethodCallHandler(_platformCallHandler);
+    return _privateChannel!;
+  }
+
+  static late void Function(dynamic) didReceiveDeepLinkWithIdentifier;
+
+  static Future<void> _platformCallHandler(MethodCall call) {
+    try {
+      switch (call.method) {
+        case 'didReceiveDeepLinkWithIdentifier':
+          didReceiveDeepLinkWithIdentifier(call.arguments);
+          break;
+        default:
+          print('Unknowm method ${call.method} ');
+      }
+    } catch (e) {
+      print(e);
+    }
+    return Future.value();
+  }
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');

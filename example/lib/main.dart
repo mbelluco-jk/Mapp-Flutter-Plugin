@@ -48,6 +48,11 @@ class _HomePageState extends State<HomePage> {
     initPlatformState();
   }
 
+  void didReceiveDeepLinkWithIdentifierHandler(dynamic arguments) {
+    print("deep link received!");
+    print(arguments);
+  }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String? platformVersion;
@@ -252,6 +257,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    MappSdk.engage(
+        "sdk key", "google projec id", SERVER.TEST, "app id", "tennant id");
+    MappSdk.didReceiveDeepLinkWithIdentifier = (dynamic arguments) =>
+        didReceiveDeepLinkWithIdentifierHandler(arguments);
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(

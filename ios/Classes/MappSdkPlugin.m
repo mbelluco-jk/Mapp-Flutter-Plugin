@@ -3,13 +3,17 @@
 #import <AppoxeeInappSDK.h>
 #import <WebKit/WebKit.h>
 
-@interface MappSdkPlugin ()
+static FlutterMethodChannel *channel;
+
+@interface MappSdkPlugin () <AppoxeeInappDelegate>
 @property WKWebView* webView;
 @end
 
 @implementation MappSdkPlugin
+
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  FlutterMethodChannel* channel = [FlutterMethodChannel
+  channel = [FlutterMethodChannel
       methodChannelWithName:@"mapp_sdk"
             binaryMessenger:[registrar messenger]];
   MappSdkPlugin* instance = [[MappSdkPlugin alloc] init];
@@ -22,7 +26,13 @@
   } else if ([@"engage" isEqualToString:call.method]){
     NSNumber* severNumber = call.arguments[2];
     [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:NULL with:TEST];
-    [[AppoxeeInapp shared] engageWithDelegate:NULL with:tEST];
+    [[AppoxeeInapp shared] engageWithDelegate:self with:tEST];
+
+    //add notifications listeners
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveDeepLinkWithIdentifier" object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveDeepLinkWithIdentifier:) name:@"didReceiveDeepLinkWithIdentifier" object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveCustomLinkWithIdentifier:) name:@"didReceiveCustomLinkWithIdentifier" object:nil];
+
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     BOOL value = call.arguments[0];
     [[Appoxee shared] setPostponeNotificationRequest:value];
@@ -133,6 +143,26 @@
   } else {
     result(FlutterMethodNotImplemented);
   }
+}
+
+- (void)didReceiveDeepLinkWithIdentifier:(NSNotification *)notification {
+    NSLog(@"notification reveived %@!", notification);
+    [channel invokeMethod:@"didReceiveDeepLinkWithIdentifier" arguments:notification.userInfo];
+}
+
+//inapp delegate methods
+-(void)didReceiveDeepLinkWithIdentifier:(NSNumber *)identifier withMessageString:(NSString *)message andTriggerEvent:(NSString *)triggerEvent {
+    NSLog(@"kavabunga %@, %@, %@", identifier, message, triggerEvent);
+    if (identifier && message && triggerEvent) {
+      NSLog(@"notification: %@", @{@"action":[identifier stringValue], @"url": message, @"event_trigger": triggerEvent });
+        [[NSNotificationCenter defaultCenter] postNotificationName:
+     @"didReceiveDeepLinkWithIdentifier" object:nil userInfo:@{@"action":[identifier stringValue], @"url": message, @"event_trigger": triggerEvent }];
+     NSLog(@"notification sent!");
+    }
+}
+
+- (void)didReceiveCustomLinkWithIdentifier:(NSNumber *)identifier withMessageString:(NSString *)message {
+    NSLog(@"notification with custom link received: %@, %@!", identifier, message);
 }
 
 - (NSDictionary *) deviceInfo: (APXClientDevice *) device {
