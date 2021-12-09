@@ -53,7 +53,32 @@ class _HomePageState extends State<HomePage> {
     print(arguments);
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
+  void didReceiveInappMessageWithIdentifierHandler(dynamic arguments) {
+    print("Inapp message received!");
+    print(arguments);
+  }
+
+  void didReceiveCustomLinkWithIdentifierHandler(dynamic arguments) {
+    print("Custom Link With Identifier received!");
+    print(arguments);
+  }
+
+  void didReceiveInBoxMessagesHandler(dynamic arguments) {
+    print("Inbox Messages received!");
+    print(arguments);
+  }
+
+  void inAppCallFailedWithResponseHandler(dynamic arguments) {
+    print("inApp Call Failed received!");
+    print(arguments);
+  }
+
+  void didReceiveInBoxMessageHandler(dynamic arguments) {
+    print("Inbox Message received!");
+    print(arguments);
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method. 
   Future<void> initPlatformState() async {
     String? platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -240,9 +265,10 @@ class _HomePageState extends State<HomePage> {
       MappSdk.logOut(false);
     } else if (_screens[index] == "In App: App Open") {
       MappSdk.triggerInApp("app_open");
+    } else if (_screens[index] == "Fetch inbox messages") {
+      MappSdk.fetchInboxMessage();
     } else if (_screens[index] == "In App: App Feedback") {
-      //MappSdk.showWebView();
-      MappSdk.showWebViewNbaPlayer();
+      MappSdk.fetchInBoxMessageWithMessageId(18870);
     }
   }
 
@@ -261,6 +287,16 @@ class _HomePageState extends State<HomePage> {
         "sdk key", "google projec id", SERVER.TEST, "app id", "tennant id");
     MappSdk.didReceiveDeepLinkWithIdentifier = (dynamic arguments) =>
         didReceiveDeepLinkWithIdentifierHandler(arguments);
+    MappSdk.didReceiveInappMessageWithIdentifier = (dynamic arguments) =>
+        didReceiveInappMessageWithIdentifierHandler(arguments);
+    MappSdk.didReceiveCustomLinkWithIdentifier = (dynamic arguments) =>
+        didReceiveCustomLinkWithIdentifierHandler(arguments);
+    MappSdk.didReceiveInBoxMessages = (dynamic arguments) =>
+        didReceiveInBoxMessagesHandler(arguments); 
+    MappSdk.inAppCallFailedWithResponse = (dynamic arguments) =>
+        inAppCallFailedWithResponseHandler(arguments); 
+    MappSdk.didReceiveInBoxMessage = (dynamic arguments) =>
+        didReceiveInBoxMessageHandler(arguments);
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(

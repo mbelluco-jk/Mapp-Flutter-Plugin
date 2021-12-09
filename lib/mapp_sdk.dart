@@ -17,12 +17,32 @@ class MappSdk {
   }
 
   static late void Function(dynamic) didReceiveDeepLinkWithIdentifier;
+  static late void Function(dynamic) didReceiveInappMessageWithIdentifier;
+  static late void Function(dynamic) didReceiveCustomLinkWithIdentifier;
+  static late void Function(dynamic) didReceiveInBoxMessages;
+  static late void Function(dynamic) inAppCallFailedWithResponse;
+  static late void Function(dynamic) didReceiveInBoxMessage;
 
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
       switch (call.method) {
         case 'didReceiveDeepLinkWithIdentifier':
           didReceiveDeepLinkWithIdentifier(call.arguments);
+          break;
+        case 'didReceiveInappMessageWithIdentifier':
+          didReceiveInappMessageWithIdentifier(call.arguments);
+          break;
+        case 'didReceiveCustomLinkWithIdentifier':
+          didReceiveCustomLinkWithIdentifier(call.arguments);
+          break;
+        case 'didReceiveInBoxMessages':
+          didReceiveInBoxMessages(call.arguments);
+          break;
+        case 'inAppCallFailedWithResponse':
+          inAppCallFailedWithResponse(call.arguments);
+          break;
+        case 'didReceiveInBoxMessage':
+          didReceiveInBoxMessage(call.arguments);
           break;
         default:
           print('Unknowm method ${call.method} ');
@@ -160,14 +180,15 @@ class MappSdk {
     return returnValue;
   }
 
-  static Future<String?> showWebView() async {
-    final String returnValue = await _channel.invokeMethod('showWebView');
+  static Future<dynamic> fetchInboxMessage() async {
+    final String returnValue =
+        await _channel.invokeMethod('fetchInboxMessage');
     return returnValue;
   }
 
-  static Future<String?> showWebViewNbaPlayer() async {
-    final String returnValue = await _channel.invokeMethod('triggerWebview');
-    print("play will be displayed");
-    return returnValue;
-  }
+  static Future<String?> fetchInBoxMessageWithMessageId(int value) async {
+      final String returnValue =
+          await _channel.invokeMethod('fetchInBoxMessageWithMessageId', [value]);
+      return returnValue;
+    }
 }
