@@ -78,7 +78,17 @@ class _HomePageState extends State<HomePage> {
     print(arguments);
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method. 
+  void remoteNotificationHandler(dynamic arguments) {
+    print("remote Notification received!");
+    print(arguments);
+  }
+
+  void richContentHandler(dynamic arguments) {
+    print("rich Content received!");
+    print(arguments);
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String? platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
@@ -291,12 +301,18 @@ class _HomePageState extends State<HomePage> {
         didReceiveInappMessageWithIdentifierHandler(arguments);
     MappSdk.didReceiveCustomLinkWithIdentifier = (dynamic arguments) =>
         didReceiveCustomLinkWithIdentifierHandler(arguments);
-    MappSdk.didReceiveInBoxMessages = (dynamic arguments) =>
-        didReceiveInBoxMessagesHandler(arguments); 
-    MappSdk.inAppCallFailedWithResponse = (dynamic arguments) =>
-        inAppCallFailedWithResponseHandler(arguments); 
-    MappSdk.didReceiveInBoxMessage = (dynamic arguments) =>
-        didReceiveInBoxMessageHandler(arguments);
+    MappSdk.didReceiveInBoxMessages =
+        (dynamic arguments) => didReceiveInBoxMessagesHandler(arguments);
+    MappSdk.inAppCallFailedWithResponse =
+        (dynamic arguments) => inAppCallFailedWithResponseHandler(arguments);
+    MappSdk.didReceiveInBoxMessage =
+        (dynamic arguments) => didReceiveInBoxMessageHandler(arguments);
+
+    MappSdk.handledRemoteNotification =
+        (dynamic arguments) => remoteNotificationHandler(arguments);
+    MappSdk.handledRichContent =
+        (dynamic arguments) => richContentHandler(arguments);
+
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(

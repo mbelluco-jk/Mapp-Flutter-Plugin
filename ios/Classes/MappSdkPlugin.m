@@ -1,4 +1,5 @@
 #import "MappSdkPlugin.h"
+#import "PushMessageDelegate.h"
 #import <AppoxeeSDK.h>
 #import <AppoxeeInappSDK.h>
 
@@ -24,7 +25,9 @@ static FlutterMethodChannel *channel;
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"engage" isEqualToString:call.method]){
     NSNumber* severNumber = call.arguments[2];
-    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:NULL with:TEST];
+    PushMessageDelegate* pushMessageDelegate = [[PushMessageDelegate alloc] initWith:channel];
+    [pushMessageDelegate addNotificationListeners];
+    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:pushMessageDelegate with:TEST];
     [[AppoxeeInapp shared] engageWithDelegate:self with:tEST];
 
     //add notifications listeners

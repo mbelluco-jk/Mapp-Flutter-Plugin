@@ -16,12 +16,17 @@ class MappSdk {
     return _privateChannel!;
   }
 
+  //inapp handlers
   static late void Function(dynamic) didReceiveDeepLinkWithIdentifier;
   static late void Function(dynamic) didReceiveInappMessageWithIdentifier;
   static late void Function(dynamic) didReceiveCustomLinkWithIdentifier;
   static late void Function(dynamic) didReceiveInBoxMessages;
   static late void Function(dynamic) inAppCallFailedWithResponse;
   static late void Function(dynamic) didReceiveInBoxMessage;
+
+  //push notification handlers
+  static late void Function(dynamic) handledRemoteNotification;
+  static late void Function(dynamic) handledRichContent;
 
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
@@ -43,6 +48,12 @@ class MappSdk {
           break;
         case 'didReceiveInBoxMessage':
           didReceiveInBoxMessage(call.arguments);
+          break;
+        case 'handledRemoteNotification':
+          handledRemoteNotification(call.arguments);
+          break;
+        case 'handledRichContent':
+          handledRichContent(call.arguments);
           break;
         default:
           print('Unknowm method ${call.method} ');
@@ -181,14 +192,13 @@ class MappSdk {
   }
 
   static Future<dynamic> fetchInboxMessage() async {
-    final String returnValue =
-        await _channel.invokeMethod('fetchInboxMessage');
+    final String returnValue = await _channel.invokeMethod('fetchInboxMessage');
     return returnValue;
   }
 
   static Future<String?> fetchInBoxMessageWithMessageId(int value) async {
-      final String returnValue =
-          await _channel.invokeMethod('fetchInBoxMessageWithMessageId', [value]);
-      return returnValue;
-    }
+    final String returnValue =
+        await _channel.invokeMethod('fetchInBoxMessageWithMessageId', [value]);
+    return returnValue;
+  }
 }
