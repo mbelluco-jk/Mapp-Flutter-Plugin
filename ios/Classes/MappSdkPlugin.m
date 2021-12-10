@@ -1,7 +1,6 @@
 #import "MappSdkPlugin.h"
 #import "PushMessageDelegate.h"
-#import <AppoxeeSDK.h>
-#import <AppoxeeInappSDK.h>
+#import "InAppMessageDelegate.h"
 
 static FlutterMethodChannel *channel;
 
@@ -26,28 +25,13 @@ static FlutterMethodChannel *channel;
   } else if ([@"engage" isEqualToString:call.method]){
     NSNumber* severNumber = call.arguments[2];
     PushMessageDelegate* pushMessageDelegate = [[PushMessageDelegate alloc] initWith:channel];
+      InAppMessageDelegate* inAppMessageDelegate = [[InAppMessageDelegate alloc] initWith:channel];
     [pushMessageDelegate addNotificationListeners];
     [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:pushMessageDelegate with:TEST];
-    [[AppoxeeInapp shared] engageWithDelegate:self with:tEST];
+    [inAppMessageDelegate addNotificationListeners];
+    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:inAppMessageDelegate with:TEST];
+    [[AppoxeeInapp shared] engageWithDelegate:inAppMessageDelegate with:tEST];
 
-    //add notifications listeners
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveDeepLinkWithIdentifier" object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveDeepLinkWithIdentifier:) name:@"didReceiveDeepLinkWithIdentifier" object:nil];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveInappMessageWithIdentifier" object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveInappMessageWithIdentifier:) name:@"didReceiveInappMessageWithIdentifier" object:nil];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveCustomLinkWithIdentifier" object:nil];
-      [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveCustomLinkWithIdentifierHandler:) name:@"didReceiveCustomLinkWithIdentifier" object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveInBoxMessages" object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveInBoxMessagesHandler:) name:@"didReceiveInBoxMessages" object:nil];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveInBoxMessage" object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveInBoxMessageHandler:) name:@"didReceiveInBoxMessage" object:nil];
-      
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveCustomLinkWithIdentifier" object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveCustomLinkWithIdentifierHandler:) name:@"didReceiveCustomLinkWithIdentifier" object:nil];
 
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     BOOL value = call.arguments[0];
@@ -155,106 +139,6 @@ static FlutterMethodChannel *channel;
   } else {
     result(FlutterMethodNotImplemented);
   }
-}
-
-- (void)didReceiveDeepLinkWithIdentifier:(NSNotification *)notification {
-    NSLog(@"notification reveived %@!", notification);
-    [channel invokeMethod:@"didReceiveDeepLinkWithIdentifier" arguments:notification.userInfo];
-}
-
-- (void)didReceiveInappMessageWithIdentifier:(NSNotification *)notification {
-    NSLog(@"notification reveived in didReceiveInappMessage %@!", notification);
-    [channel invokeMethod:@"didReceiveInappMessageWithIdentifier" arguments:notification.userInfo];
-}
-
-- (void)didReceiveCustomLinkWithIdentifierHandler:(NSNotification *)notification {
-    NSLog(@"notification reveived in didReceiveCustomLinkWith %@!", notification);
-    [channel invokeMethod:@"didReceiveCustomLinkWithIdentifier" arguments:notification.userInfo];
-}
-
-- (void)didReceiveInBoxMessagesHandler:(NSNotification *)notification {
-    NSLog(@"notification reveived in didReceiveInBoxMessages %@!", notification);
-    [channel invokeMethod:@"didReceiveInBoxMessages" arguments:notification.userInfo];
-}
-
-- (void)inAppCallFailedWithResponseHandler:(NSNotification *)notification {
-    NSLog(@"notification reveived in inAppCallFailedWithResponse %@!", notification);
-    [channel invokeMethod:@"inAppCallFailedWithResponse" arguments:notification.userInfo];
-}
-
-- (void)didReceiveInBoxMessageHandler:(NSNotification *)notification {
-    NSLog(@"notification reveived in didReceiveInBoxMessage %@!", notification);
-    [channel invokeMethod:@"didReceiveInBoxMessage" arguments:notification.userInfo];
-}
-
-//inapp delegate methods
--(void)didReceiveDeepLinkWithIdentifier:(NSNumber *)identifier withMessageString:(NSString *)message andTriggerEvent:(NSString *)triggerEvent {
-    NSLog(@"kavabunga %@, %@, %@", identifier, message, triggerEvent);
-    if (identifier && message && triggerEvent) {
-      NSLog(@"notification: %@", @{@"action":[identifier stringValue], @"url": message, @"event_trigger": triggerEvent });
-        [[NSNotificationCenter defaultCenter] postNotificationName:
-     @"didReceiveDeepLinkWithIdentifier" object:nil userInfo:@{@"action":[identifier stringValue], @"url": message, @"event_trigger": triggerEvent }];
-     NSLog(@"notification sent!");
-    }
-}
-
-
-- (void)appoxeeInapp:(nonnull AppoxeeInapp *)appoxeeInapp didReceiveInappMessageWithIdentifier:
-(nonnull NSNumber *)identifier andMessageExtraData:(nullable NSDictionary <NSString *, id> *)
-messageExtraData{
-  NSDictionary* dict = [[NSDictionary alloc] init];
-        if (messageExtraData) {
-            dict = @{@"id": [identifier stringValue], @"extraData": messageExtraData};
-        } else {
-            dict = @{@"id": [identifier stringValue]};
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:
-        @"didReceiveInappMessageWithIdentifier" object:nil userInfo:dict];
-        NSLog(@"notification sent!");
-}
-
-- (void)didReceiveCustomLinkWithIdentifier:(nonnull NSNumber *)identifier withMessageString:(nonnull NSString *)message{
-  if (identifier && message) {
-    [[NSNotificationCenter defaultCenter] postNotificationName:
-        @"didReceiveInappMessageWithIdentifier" object:nil userInfo:@{@"id":[identifier stringValue], @"message": message}];
-        NSLog(@"notification sent!");
-        NSLog(@"didReceive Custom Link With Identifier: %@!", @{@"id":[identifier stringValue], @"message": message});
-          }
-}
-
-- (void)didReceiveInBoxMessages:(NSArray *_Nullable)messages{
-  NSMutableArray *dicts = [[NSMutableArray alloc] init];
-    for(APXInBoxMessage *message in messages) {
-        [dicts addObject:[message getDictionary]];
-    }
-    if (dicts) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:
-       @"didReceiveInBoxMessages" object:nil userInfo:dicts];
-        NSLog(@"Receive inbox Messages");
-    }
-
-}
-
-- (void)inAppCallFailedWithResponse:(NSString *_Nullable)response andError:(NSError *_Nullable)error{
-   NSError* newError = [NSError errorWithDomain:@"com.mapp.flutterError" code:200 userInfo:@{@"Error reason": @"There is not data"}];
-        NSString* newResponse = @"There is not data!";
-        if (error)
-            newError = error;
-        if (response)
-            newResponse = response;
-        [[NSNotificationCenter defaultCenter] postNotificationName:
-       @"inAppCallFailedWithResponse" object:nil userInfo:@{@"error": newError, @"response": newResponse}];
-        NSLog(@"inApp Call Failed With Response: %@!", @{@"error": newError, @"response": newResponse});
-}
-
-- (void)didReceiveInBoxMessage:(APXInBoxMessage *_Nullable)message{
-    if ([message getDictionary]) {
-      [[NSNotificationCenter defaultCenter] postNotificationName:
-       @"didReceiveInBoxMessage" object:nil userInfo:[message getDictionary]];
-        NSLog(@"did Receive InBox Message: %@!", [message getDictionary]);
-      
-        // [self sendEventWithName: MappRNInboxMessageReceived body: [message getDictionary]];
-    }
 }
 
 - (NSDictionary *) deviceInfo: (APXClientDevice *) device {

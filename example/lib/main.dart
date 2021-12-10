@@ -278,7 +278,13 @@ class _HomePageState extends State<HomePage> {
     } else if (_screens[index] == "Fetch inbox messages") {
       MappSdk.fetchInboxMessage();
     } else if (_screens[index] == "In App: App Feedback") {
-      MappSdk.fetchInBoxMessageWithMessageId(18870);
+      //FetchInBox se koristi samo za testiranje
+      // MappSdk.fetchInBoxMessageWithMessageId(18870);
+      MappSdk.triggerInApp("app_feedback");
+    } else if (_screens[index] == "In App: App Discount") {
+      MappSdk.triggerInApp("app_discount");
+    } else if (_screens[index] == "In App: App Promo") {
+      MappSdk.triggerInApp("app_promo");
     }
   }
 
