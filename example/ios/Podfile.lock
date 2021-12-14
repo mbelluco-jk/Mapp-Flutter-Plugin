@@ -2,9 +2,9 @@ PODS:
   - Flutter (1.0.0)
   - mapp_sdk (0.0.1):
     - Flutter
-    - MappSDK (= 6.0.5)
+    - MappSDK (= 6.0.5.1)
     - MappSDKInapp (= 6.0.6.6)
-  - MappSDK (6.0.5)
+  - MappSDK (6.0.5.1)
   - MappSDKInapp (6.0.6.6)
 
 DEPENDENCIES:
@@ -24,8 +24,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  mapp_sdk: fb88958b9a8f02b85168af42302ebbca412af8d8
-  MappSDK: b7ef4b5cacacf10848a9af52402b06b5a6348499
+  mapp_sdk: 33690790ff9d111927378b861abfadcfbeae2bbd
+  MappSDK: ec94b044904abf01c79ea37ddac084a81a8a088e
   MappSDKInapp: 2eb142dc9bd21b00faf935a5bb97d5a73ef9b583
 
 PODFILE CHECKSUM: a5ead389ae8478b2f010fbadad4f103eae9ff09f
