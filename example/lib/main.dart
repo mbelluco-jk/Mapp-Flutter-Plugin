@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   String? _tagToSetString = '';
   String? _tagToRemoveString = '';
   String? _stringToSetString = '';
-  String? _attributeToGetString='';
+  String? _attributeToGetString = '';
   String? _stringToRemoveString = '';
 
   List<String> _screens = [];
@@ -175,8 +175,8 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Enter alias'),
-            onChanged: (String? value){
-              _aliasToSetString=value?.trim();
+            onChanged: (String? value) {
+              _aliasToSetString = value?.trim();
             },
           ),
         );
@@ -215,9 +215,10 @@ class _HomePageState extends State<HomePage> {
           child: TextFormField(
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Get attribute'),
-          onChanged: (String? value){
-              _attributeToGetString=value?.trim();
-          },),
+            onChanged: (String? value) {
+              _attributeToGetString = value?.trim();
+            },
+          ),
         );
       case 23:
         return Card(
@@ -247,23 +248,23 @@ class _HomePageState extends State<HomePage> {
 
   void onTap(int index) {
     if (_screens[index] == "Engage") {
-      MappSdk.engage(Config.sdkKey,Config.googleProjectId,Config.server, Config.appID, Config.tenantID);
+      MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
+          Config.appID, Config.tenantID);
     } else if (_screens[index] == "Set Device Alias") {
       if (_aliasToSetString?.isNotEmpty ?? false) {
         MappSdk.setAlias(_aliasToSetString!);
-      }else{
+      } else {
         _showMyDialog('Alias', "Not set", "Alias can't be empty");
       }
     } else if (_screens[index] == "Get Device Alias") {
       MappSdk.getAlias().then(
           (String value) => {_showMyDialog("Show Alias", "Alias:", value)});
     } else if (_screens[index] == "Device Information") {
-      String data='';
-      MappSdk.getDeviceInfo().then((Map<String, dynamic>? map)
-          {
-            data=map!=null ? jsonEncode(map) : "null";
-            _showMyDialog("Device info", "", data);
-          });
+      String data = '';
+      MappSdk.getDeviceInfo().then((Map<String, dynamic>? map) {
+        data = map != null ? jsonEncode(map) : "null";
+        _showMyDialog("Device info", "", data);
+      });
     } else if (_screens[index] == "Is Push Enabled") {
       MappSdk.isPushEnabled().then((bool value) =>
           {_showMyDialog("Show Device Information", "", value ? "YES" : "NO")});
@@ -309,7 +310,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    MappSdk.engage(Config.sdkKey,Config.googleProjectId,Config.server, Config.appID, Config.tenantID);
+    MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
+        Config.appID, Config.tenantID);
 
     MappSdk.didReceiveDeepLinkWithIdentifier = (dynamic arguments) =>
         didReceiveDeepLinkWithIdentifierHandler(arguments);
