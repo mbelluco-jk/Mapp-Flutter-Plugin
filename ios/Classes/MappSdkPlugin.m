@@ -117,7 +117,7 @@ static FlutterMethodChannel *channel;
   } else if ([@"getDeviceInfo" isEqualToString:call.method]){
     APXClientDevice* device = [[Appoxee shared] deviceInfo];
     NSDictionary *deviceData = [self deviceInfo:device];
-    result([deviceData description]);
+    result(deviceData);
   } else if ([@"removeBadgeNumber" isEqualToString:call.method]){
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
   } else if ([@"addTagsToDevice" isEqualToString:call.method]){
