@@ -34,16 +34,16 @@ static FlutterMethodChannel *channel;
 
 
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
-    BOOL value = call.arguments[0];
-    [[Appoxee shared] setPostponeNotificationRequest:value];
+    NSNumber *value = call.arguments[0];
+    [[Appoxee shared] setPostponeNotificationRequest:[value boolValue]];
   } else if ([@"showNotificationsOnForeground" isEqualToString:call.method]){
-    BOOL value = call.arguments[0];
-    [[Appoxee shared] setShowNotificationsOnForeground:value];
+    NSNumber *value = call.arguments[0];
+    [[Appoxee shared] setShowNotificationsOnForeground:[value boolValue]];
   } else if ([@"isReady" isEqualToString:call.method]) {
     result([[Appoxee shared] isReady] ? @YES : @NO);
   } else if ([@"optIn" isEqualToString:call.method]){
-    BOOL value = call.arguments[0];
-    [[Appoxee shared] disablePushNotifications:!value withCompletionHandler:NULL];
+    NSNumber *value = call.arguments[0];
+    [[Appoxee shared] disablePushNotifications:![value boolValue] withCompletionHandler:NULL];
   } else if ([@"isPushEnabled" isEqualToString:call.method]){
     [[Appoxee shared] isPushEnabled:^(NSError * _Nullable appoxeeError, id  _Nullable data) {
         if (!appoxeeError) {
@@ -54,8 +54,8 @@ static FlutterMethodChannel *channel;
         }
     }];
   } else if ([@"logoutWithOptin" isEqualToString:call.method]){
-    BOOL value = call.arguments[0];
-    [[Appoxee shared] logoutWithOptin:value];
+    NSNumber *value = call.arguments[0];
+    [[Appoxee shared] logoutWithOptin:[value boolValue]];
   } else if ([@"setDeviceAlias" isEqualToString:call.method]){
     NSString* alias = call.arguments[0];
     [[Appoxee shared] setDeviceAlias:alias withCompletionHandler:NULL];

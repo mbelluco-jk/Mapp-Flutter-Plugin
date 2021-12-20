@@ -121,61 +121,9 @@ class MappSdk {
     return alias;
   }
 
-  static Future<List<String>?> getTags() async {
-    final List<String> tags = await _channel.invokeMethod('fetchDeviceTags');
-    return tags;
-  }
-
-  static Future<List<String>?> fetchApplicationTags() async {
-    final List<String> tags =
-        await _channel.invokeMethod('fetchApplicationTags');
-    return tags;
-  }
-
-  static Future<String?> addTags(List<String> tags) async {
-    final String version =
-        await _channel.invokeMethod('addTagsToDevice', [tags]);
-    return "Tags are added successfully! $version";
-  }
-
-  static Future<String?> removeTags(List<String> tags) async {
-    final String version =
-        await _channel.invokeMethod('removeTagsFromDevice', [tags]);
-    return "Tags are removed successfully! $version";
-  }
-
-  static Future<String?> setDateValueWithKey(DateTime date, String key) async {
-    final String version =
-        await _channel.invokeMethod('setDateValueWithKey', [date, key]);
-    return "Date $date added successfully! $version";
-  }
-
-  static Future<String?> setAttributeInt(String key, int value) async {
-    final String version =
-        await _channel.invokeMethod('setNumberValueWithKey', [value, key]);
-    return "Number $value added successfully! $version";
-  }
-
-  static Future<String?> incrementNumericKey(String key, int value) async {
-    final String version =
-        await _channel.invokeMethod('incrementNumericKey', [value, key]);
-    return "Number $value incremented successfully! $version";
-  }
-
-  static Future<String?> setAttributeString(String key, String value) async {
-    final String version =
-        await _channel.invokeMethod('setStringValueWithKey', [value, key]);
-    return "String $value added successfully! $version";
-  }
-
-  static Future<String?> fetchCustomFieldByKey(String key) async {
-    final String fieldValue =
-        await _channel.invokeMethod('fetchCustomFieldByKey', [key]);
-    return fieldValue;
-  }
-
-  static Future<Map<String,dynamic>?> getDeviceInfo() async {
-    final Map<String,dynamic>? deviceInfo = await _channel.invokeMapMethod<String, dynamic>('getDeviceInfo');
+  static Future<Map<String, dynamic>?> getDeviceInfo() async {
+    final Map<String, dynamic>? deviceInfo =
+        await _channel.invokeMapMethod<String, dynamic>('getDeviceInfo');
     return deviceInfo;
   }
 

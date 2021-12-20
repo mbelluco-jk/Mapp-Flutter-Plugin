@@ -123,15 +123,6 @@ class _HomePageState extends State<HomePage> {
         "In App: App Feedback",
         "In App: App Discount",
         "In App: App Promo",
-        "Get Tags",
-        "Set Tag Text",
-        "Set Tags",
-        "Remove Tag Text",
-        "Remove Tag",
-        "Set Attribute Text",
-        "Set Attribute",
-        "Get Attribute Text",
-        "Get Attribute",
         "Remove Badge Number",
         "Lock Orientation",
         "Engage",
@@ -180,56 +171,6 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         );
-      case 15:
-        return Card(
-          child: TextFormField(
-            decoration: const InputDecoration(
-                border: UnderlineInputBorder(), labelText: 'Set tag'),
-            onChanged: (String? value) {
-              _tagToSetString = value?.trim();
-            },
-          ),
-        );
-      case 17:
-        return Card(
-          child: TextFormField(
-            decoration: const InputDecoration(
-                border: UnderlineInputBorder(), labelText: 'Remove tag'),
-            onChanged: (String? value) {
-              _tagToRemoveString = value?.trim();
-            },
-          ),
-        );
-      case 19:
-        return Card(
-          child: TextFormField(
-            decoration: const InputDecoration(
-                border: UnderlineInputBorder(), labelText: 'Set Attribute'),
-            onChanged: (String? value) {
-              _stringToSetString = value?.trim();
-            },
-          ),
-        );
-      case 21:
-        return Card(
-          child: TextFormField(
-            decoration: const InputDecoration(
-                border: UnderlineInputBorder(), labelText: 'Get attribute'),
-            onChanged: (String? value) {
-              _attributeToGetString = value?.trim();
-            },
-          ),
-        );
-      case 23:
-        return Card(
-          child: TextFormField(
-            decoration: const InputDecoration(
-                border: UnderlineInputBorder(), labelText: 'Remove attribute'),
-            onChanged: (String? value) {
-              _stringToRemoveString = value?.trim();
-            },
-          ),
-        );
       default:
         return Card(
           child: ListTile(
@@ -272,14 +213,6 @@ class _HomePageState extends State<HomePage> {
       MappSdk.setPushEnabled(true);
     } else if (_screens[index] == "Opt out") {
       MappSdk.setPushEnabled(false);
-    } else if (_screens[index] == "Set Tags") {
-      List<String> tags = [_tagToSetString!];
-      MappSdk.addTags(tags);
-    } else if (_screens[index] == "Remove Tag") {
-      List<String> tags = [_tagToRemoveString!];
-      MappSdk.removeTags(tags);
-    } else if (_screens[index] == "Set Attribute") {
-      MappSdk.setAttributeString("stringKey", _stringToSetString!);
     } else if (_screens[index] == "Remove Badge Number") {
       MappSdk.removeBadgeNumber();
     } else if (_screens[index] == "Log out") {
