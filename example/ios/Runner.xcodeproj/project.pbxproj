@@ -75,6 +75,7 @@
 		A340EFEE2771C383001BCCD0 /* NotificationService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationService.h; sourceTree = "<group>"; };
 		A340EFEF2771C383001BCCD0 /* NotificationService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotificationService.m; sourceTree = "<group>"; };
 		A340EFF12771C383001BCCD0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A340EFFA277204D9001BCCD0 /* RunnerExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerExtension.entitlements; sourceTree = "<group>"; };
 		A3FDCE0C2747D1FC00FB14A7 /* AppoxeeConfig.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = AppoxeeConfig.plist; sourceTree = SOURCE_ROOT; };
 		A3FDCE0E2747D2B400FB14A7 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		B2527CD67145B2D98F4FFC91 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
@@ -179,6 +180,7 @@
 		A340EFED2771C383001BCCD0 /* RunnerExtension */ = {
 			isa = PBXGroup;
 			children = (
+				A340EFFA277204D9001BCCD0 /* RunnerExtension.entitlements */,
 				A340EFEE2771C383001BCCD0 /* NotificationService.h */,
 				A340EFEF2771C383001BCCD0 /* NotificationService.m */,
 				A340EFF12771C383001BCCD0 /* Info.plist */,
@@ -468,10 +470,12 @@
 				DEVELOPMENT_TEAM = LERY366S7C;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "x86_64 $(ARCHS_STANDARD)";
@@ -595,10 +599,12 @@
 				DEVELOPMENT_TEAM = LERY366S7C;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "x86_64 $(ARCHS_STANDARD)";
@@ -617,10 +623,12 @@
 				DEVELOPMENT_TEAM = LERY366S7C;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALID_ARCHS = "x86_64 $(ARCHS_STANDARD)";
@@ -637,6 +645,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = RunnerExtension/RunnerExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LERY366S7C;
@@ -645,7 +654,7 @@
 				INFOPLIST_FILE = RunnerExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RunnerExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -654,7 +663,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest.RunnerExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest.MappPushExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -671,6 +680,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = RunnerExtension/RunnerExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LERY366S7C;
@@ -679,7 +689,7 @@
 				INFOPLIST_FILE = RunnerExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RunnerExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -687,7 +697,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest.RunnerExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest.MappPushExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -704,6 +714,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = RunnerExtension/RunnerExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LERY366S7C;
@@ -712,7 +723,7 @@
 				INFOPLIST_FILE = RunnerExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RunnerExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -720,7 +731,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest.RunnerExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.testVladanRandjelovic.cep.VladanApoxeeTest.MappPushExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
