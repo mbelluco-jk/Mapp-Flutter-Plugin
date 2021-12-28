@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PushMessageDelegate : NSObject
 
--(instancetype)initWith:(FlutterMethodChannel*) channel;
+-(void)initWith:(FlutterMethodChannel*) channel;
++ (PushMessageDelegate *)sharedObject;
 -(void) addNotificationListeners;
 
 @end

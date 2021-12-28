@@ -4,7 +4,7 @@
 
 static FlutterMethodChannel *channel;
 
-@interface MappSdkPlugin () <AppoxeeInappDelegate>
+@interface MappSdkPlugin ()
 
 @end
 
@@ -24,15 +24,12 @@ static FlutterMethodChannel *channel;
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"engage" isEqualToString:call.method]){
     NSNumber* severNumber = call.arguments[2];
-    PushMessageDelegate* pushMessageDelegate = [[PushMessageDelegate alloc] initWith:channel];
-      InAppMessageDelegate* inAppMessageDelegate = [[InAppMessageDelegate alloc] initWith:channel];
-    [pushMessageDelegate addNotificationListeners];
-    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:pushMessageDelegate with:TEST];
+    InAppMessageDelegate* inAppMessageDelegate = [[InAppMessageDelegate alloc] initWith:channel];
+    [[PushMessageDelegate sharedObject] initWith:channel];
+    [[PushMessageDelegate sharedObject] addNotificationListeners];
+    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:(id)[PushMessageDelegate sharedObject] with:TEST];
     [inAppMessageDelegate addNotificationListeners];
-    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:inAppMessageDelegate with:TEST];
     [[AppoxeeInapp shared] engageWithDelegate:inAppMessageDelegate with:tEST];
-
-
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     NSNumber *value = call.arguments[0];
     [[Appoxee shared] setPostponeNotificationRequest:[value boolValue]];

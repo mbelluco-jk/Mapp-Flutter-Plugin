@@ -2,8 +2,9 @@
 //
 
 #import "PushMessageDelegate.h"
+#import <UIKit/UIKit.h>
 
-@interface PushMessageDelegate() <AppoxeeNotificationDelegate>
+@interface PushMessageDelegate() <AppoxeeDelegate, UIApplicationDelegate>
 
 @property FlutterMethodChannel* channel;
 
@@ -11,15 +12,22 @@
 
 @implementation PushMessageDelegate
 
-- (instancetype)initWith:(FlutterMethodChannel *)channel {
-    if (!self) {
-        self = [super init];
-    }
++ (PushMessageDelegate *)sharedObject {
+    static PushMessageDelegate *sharedClass = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedClass = [[self alloc] init];
+    });
+    return sharedClass;
+}
+
+- (void)initWith:(FlutterMethodChannel *)channel {
     self.channel = channel;
-    return self;
+    NSLog(@"Push Delegate init done!");
 }
 
 - (void)addNotificationListeners {
+    NSLog(@"Listeners will be added!");
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"handledRemoteNotification" object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(remoteNotificationHandler:) name:@"handledRemoteNotification" object:nil];
 
@@ -48,15 +56,20 @@
     NSString* deepLink = pushNotification.extraFields[@"apx_dpl"];
     if (deepLink && ![deepLink isEqualToString:@""] && actionIdentifier) {
         [[NSNotificationCenter defaultCenter] postNotificationName:
-            @"handledRemoteNotification" object:nil userInfo: @{@"action":actionIdentifier, @"url": deepLink, @"event_trigger": @"" }];
+            @"didReceiveDeepLinkWithIdentifier" object:nil userInfo: @{@"action":actionIdentifier, @"url": deepLink, @"event_trigger": @"" }];
     }
 }
 
 - (void)appoxee:(Appoxee *)appoxee handledRichContent:(APXRichMessage *)richMessage didLaunchApp:(BOOL)didLaunch {
+    NSLog(@"notification reveived with %@ and it will be propagate!", [self getRichMessage:richMessage]);
     if ([self getRichMessage:richMessage]) {
         [[NSNotificationCenter defaultCenter] postNotificationName:
              @"handledRichContent" object:nil userInfo:[self getRichMessage:richMessage]];
     }
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    NSLog(@"remote silent notification %@", userInfo);
 }
 
 -(NSDictionary *) getPushMessage: (APXPushNotification *) pushMessage {
@@ -88,13 +101,20 @@
 
 -(NSDictionary *) getRichMessage: (APXRichMessage *) message {
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setObject:[[NSNumber numberWithInteger:message.uniqueID] stringValue] forKey:@"id"];
-    [dict setObject:message.title forKey:@"title"];
-    [dict setObject:message.content forKey:@"content"];
-    [dict setObject:message.title forKey:@"title"];
-    [dict setObject:message.messageLink forKey:@"messageLink"];
-    [dict setObject:[self stringFromDate: message.postDate inUTC:false] forKey:@"postDate"];
-    [dict setObject:[self stringFromDate: message.postDate inUTC:true] forKey:@"postDateUTC"];
+    if(message.uniqueID)
+        [dict setObject:[[NSNumber numberWithInteger:message.uniqueID] stringValue] forKey:@"id"];
+    if(message.title)
+        [dict setObject:message.title forKey:@"title"];
+    if(message.content)
+        [dict setObject:message.content forKey:@"content"];
+    if(message.messageLink)
+        [dict setObject:message.messageLink forKey:@"messageLink"];
+    if(message.postDate)
+        [dict setObject:[self stringFromDate: message.postDate inUTC:false] forKey:@"postDate"];
+    if(message.postDateUTC)
+        [dict setObject:[self stringFromDate: message.postDateUTC inUTC:true] forKey:@"postDateUTC"];
+    if(message.isRead)
+        [dict setObject:[NSNumber numberWithBool:message.isRead] forKey:@"isRead"];
     return dict;
 
 }
