@@ -10,4 +10,12 @@
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    signal(SIGPIPE, SIG_IGN);
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    signal(SIGPIPE, SIG_IGN);
+}
+
 @end
