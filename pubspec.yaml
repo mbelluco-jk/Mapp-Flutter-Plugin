@@ -1,7 +1,7 @@
 name: mapp_sdk
-description: A new flutter plugin project.
+description: Mapp SDK plugin enables for usage all what Mapp Engage platform like push and inapp messages segmented sendout.
 version: 0.0.1
-homepage:
+homepage: https://mapp.com
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

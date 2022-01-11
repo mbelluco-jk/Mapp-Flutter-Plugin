@@ -1,15 +1,7 @@
 # mapp_sdk
 
-A new flutter plugin project.
+Mapp SDK plugin enables the usage of Mapp Engage platform, such as push notifications and InApp messages segmented sendout.
 
-## Getting Started
-
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For implementation details please take a look at: 
+https://mapp-wiki.atlassian.net/wiki/spaces/MIC/pages/1712357377/Flutter+Plugin
 
