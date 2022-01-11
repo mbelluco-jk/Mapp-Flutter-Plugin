@@ -1,5 +1,6 @@
 package com.example.mapp_sdk;
 
+import android.app.Activity;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
@@ -8,101 +9,155 @@ import com.appoxee.Appoxee;
 import com.appoxee.AppoxeeOptions;
 import com.appoxee.DeviceInfo;
 import com.appoxee.RequestStatus;
+import com.appoxee.internal.logger.LoggerFactory;
+import com.appoxee.push.NotificationMode;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.flutter.embedding.engine.loader.FlutterLoader;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.view.FlutterMain;
 
 /**
  * MappSdkPlugin
  */
-public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
+public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
+
+    public static final String GET_PLATFORM_VERSION="getPlatformVersion";
+    public static final String ENGAGE="engage";
+    public static final String SET_DEVICE_ALIAS="setDeviceAlias";
+    public static final String GET_DEVICE_ALIAS="getDeviceAlias";
+    public static final String IS_PUSH_ENABLED="isPushEnabled";
+    public static final String OPT_IN="optIn";
+    public static final String TRIGGER_IN_APP="triggerInApp";
+    public static final String IS_READY="isReady";
+    public static final String GET_DEVICE_INFO="getDeviceInfo";
+    public static final String FETCH_INBOX_MESSAGE="fetchInboxMessage";
+    public static final String FETCH_INBOX_MESSAGES="fetchInboxMessages";
+    public static final String GET_FCM_TOKEN="getFcmToken";
+    public static final String SET_TOKEN="setToken";
+    public static final String START_GEOFENCING="startGeofencing";
+    public static final String STOP_GEOFENCING="stopGeofencing";
+    public static final String ADD_TAG="addTag";
+    public static final String FETCH_DEVICE_TAGS="fetchDeviceTags";
+    public static final String LOGOUT_WITH_OPT_IN="logoutWithOptin";
+    public static final String IS_DEVICE_REGISTERED="isDeviceRegistered";
+    public static final String SET_REMOTE_MESSAGE="setRemoteMessage";
+
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
     private MethodChannel channel;
     private Application application;
+    private Activity activity;
+    private Result result;
+
+    private final FlutterLoader flutterLoader=new FlutterLoader();
+
+    private final Appoxee.OnInitCompletedListener onInitCompletedListener=new Appoxee.OnInitCompletedListener() {
+        @Override
+        public void onInitCompleted(boolean successful, Exception failReason) {
+            if(result!=null){
+                if(successful){
+                    Appoxee.instance().getDeviceInfoDMC();
+                    DeviceInfo info = Appoxee.instance().getDeviceInfo();
+                    LoggerFactory.getDevLogger().d("DEVICE INFO: "+info);
+                    result.success(info.sdkVersion);
+                }
+                if(failReason!=null){
+                    result.error("engage",failReason.getMessage(),null);
+                }
+            }
+        }
+    };
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "mapp_sdk");
-        channel.setMethodCallHandler(this);
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), MappChannelHolder.MAPP_CHANNEL_NAME);
         application = (Application) flutterPluginBinding.getApplicationContext();
-
-        Appoxee.engage(application);
+        MappChannelHolder.setChannel(channel);
+        EventEmitter.getInstance().attachChannel(channel);
+        //channel.setMethodCallHandler(this);
     }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         List<Object> args = call.arguments();
+
+        //flutterLoader.startInitialization(application);
+        //flutterLoader.ensureInitializationComplete(application,new String[]{});
+
         switch (call.method) {
-            case "getPlatformVersion":
+            case GET_PLATFORM_VERSION:
                 result.success("Android " + android.os.Build.VERSION.RELEASE);
                 break;
-            case "engage":
+            case ENGAGE:
                 engage(args, result);
                 break;
-            case "setDeviceAlias":
+            case SET_DEVICE_ALIAS:
                 setDeviceAlias((String) args.get(0), result);
                 break;
-            case "getDeviceAlias":
+            case GET_DEVICE_ALIAS:
                 getDeviceAlias(result);
                 break;
-            case "isPushEnabled":
+            case IS_PUSH_ENABLED:
                 isPushEnabled(result);
                 break;
-            case "optIn":
+            case OPT_IN:
                 boolean isEnabled = (boolean) args.get(0);
                 setPushEnabled(isEnabled, result);
                 break;
-            case "triggerInApp":
+            case TRIGGER_IN_APP:
                 triggerInApp((String) args.get(0), result);
                 break;
-            case "isReady":
+            case IS_READY:
                 isReady(result);
                 break;
-            case "getDeviceInfo":
+            case GET_DEVICE_INFO:
                 getDeviceInfo(result);
                 break;
-            case "fetchInboxMessage":
-                fetchInboxMessage((Integer) args.get(0), result);
+            case FETCH_INBOX_MESSAGE:
+                int templateId=args!=null && args.size()>0 ? (Integer) args.get(0) :-1;
+                fetchInboxMessage(templateId, result);
                 break;
-            case "fetchInboxMessages":
+            case FETCH_INBOX_MESSAGES:
                 fetchInboxMessages(result);
                 break;
-            case "getFcmToken":
+            case GET_FCM_TOKEN:
                 getFcmToken(result);
                 break;
-            case "setToken":
+            case SET_TOKEN:
                 setToken((String) args.get(0), result);
                 break;
-            case "startGeofencing":
+            case START_GEOFENCING:
                 startGeoFencing(result);
                 break;
-            case "stopGeofencing":
+            case STOP_GEOFENCING:
                 stopGeoFencing(result);
                 break;
-            case "addTag":
+            case ADD_TAG:
                 addTag((String) args.get(0), result);
                 break;
-            case "fetchDeviceTags":
+            case FETCH_DEVICE_TAGS:
                 getTags(result);
                 break;
-            case "logoutWithOptin":
+            case LOGOUT_WITH_OPT_IN:
                 logOut((Boolean) args.get(0), result);
                 break;
-            case "isDeviceRegistered":
+            case IS_DEVICE_REGISTERED:
                 isDeviceRegistered(result);
                 break;
-            case "setRemoteMessage":
+            case SET_REMOTE_MESSAGE:
                 // TODO get remoteMessage and pass data to a native part
                 // setRemoteMessage(null,result);
                 break;
@@ -115,6 +170,8 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         channel.setMethodCallHandler(null);
+        MappChannelHolder.setChannel(null);
+        EventEmitter.getInstance().detachChannel();
         application = null;
     }
 
@@ -127,14 +184,11 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
             options.server = getServerByIndex((Integer) args.get(2));
             options.appID = (String) args.get(3);
             options.tenantID = (String) args.get(4);
+            options.notificationMode= NotificationMode.BACKGROUND_AND_FOREGROUND;
             Appoxee.engage(application, options);
-            Appoxee.instance().addInitListener((successful, failReason) -> {
-                if (successful) {
-                    result.success(true);
-                } else {
-                    result.error("engage", failReason.getMessage(), null);
-                }
-            });
+            this.result=result;
+            Appoxee.instance().addInitListener(onInitCompletedListener);
+            Appoxee.instance().setReceiver(PushBroadcastReceiver.class);
         } catch (Exception e) {
             result.error("engage", e.getMessage(), null);
         }
@@ -178,7 +232,7 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
 
     private void triggerInApp(String event, @NonNull Result result) {
         try {
-            Appoxee.instance().triggerInApp(application.getApplicationContext(), event);
+            Appoxee.instance().triggerInApp(activity, event);
             result.success("");
         } catch (Exception e) {
             result.error("isReady", e.getMessage(), null);
@@ -198,7 +252,7 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
         try {
             DeviceInfo deviceInfo = Appoxee.instance().getDeviceInfo();
             if (deviceInfo != null) {
-                result.success(deviceInfoToMap(deviceInfo));
+                result.success(MappSerializer.deviceInfoToMap(deviceInfo));
             } else {
                 result.error("getDeviceInfo", "Can't get device info!", null);
             }
@@ -209,7 +263,7 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
 
     private void fetchInboxMessage(int template, @NonNull Result result) {
         try {
-            Appoxee.instance().fetchInboxMessage(application.getApplicationContext(), template);
+            Appoxee.instance().fetchInboxMessage(activity, template);
         } catch (Exception e) {
             result.error("fetchInboxMessage", e.getMessage(), null);
         }
@@ -217,7 +271,7 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
 
     private void fetchInboxMessages(@NonNull Result result) {
         try {
-            Appoxee.instance().fetchInboxMessages(application.getApplicationContext());
+            Appoxee.instance().fetchInboxMessages(activity);
         } catch (Exception e) {
             result.error("fetchInboxMessages", e.getMessage(), null);
         }
@@ -311,23 +365,27 @@ public class MappSdkPlugin implements FlutterPlugin, MethodCallHandler {
         return AppoxeeOptions.Server.values()[index];
     }
 
-    private Map<String, Object> deviceInfoToMap(DeviceInfo deviceInfo) {
-        Map<String, Object> map = new HashMap<>();
-        try {
-            map.put("id", deviceInfo.id);
-            map.put("appVersion", deviceInfo.appVersion);
-            map.put("sdkVersion", deviceInfo.sdkVersion);
-            map.put("locale", deviceInfo.locale);
-            map.put("timezone", deviceInfo.timezone);
-            map.put("deviceModel", deviceInfo.deviceModel);
-            map.put("manufacturer", deviceInfo.manufacturer);
-            map.put("osVersion", deviceInfo.osVersion);
-            map.put("resolution", deviceInfo.resolution);
-            map.put("density", String.valueOf(deviceInfo.density));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        this.activity=binding.getActivity();
+        this.channel.setMethodCallHandler(this);
+    }
 
-        return map;
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        this.activity=null;
+        this.channel.setMethodCallHandler(null);
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        this.activity=binding.getActivity();
+        this.channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        this.activity=null;
+        this.channel.setMethodCallHandler(null);
     }
 }

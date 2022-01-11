@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+
 import 'helper_classes.dart';
 
 class MappSdk {
-  //static const MethodChannel _channel = MethodChannel('mapp_sdk');
+  // static const MethodChannel _channel = MethodChannel('mapp_sdk');
+  // MappSdk.setMethodCallHandler(_platformCallHandler);
 
-  static MethodChannel _privateChannel = const MethodChannel('mapp_sdk');
+  static const MethodChannel _privateChannel = MethodChannel('mapp_sdk');
 
   static MethodChannel get _channel {
-    if (_privateChannel == null) {
-      _privateChannel = const MethodChannel('mapp_sdk');
-    }
-    _privateChannel!.setMethodCallHandler(_platformCallHandler);
-    return _privateChannel!;
+    _privateChannel.setMethodCallHandler(_platformCallHandler);
+    return _privateChannel;
   }
 
   //inapp handlers
@@ -30,6 +29,8 @@ class MappSdk {
 
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
+      print(call.method);
+
       switch (call.method) {
         case 'didReceiveDeepLinkWithIdentifier':
           didReceiveDeepLinkWithIdentifier(call.arguments);
@@ -95,8 +96,8 @@ class MappSdk {
   }
 
   static Future<String?> setPushEnabled(bool optIn) async {
-    final String? version = await _channel.invokeMethod('optIn', [optIn]);
-    return 'successfull $version opted in device with value $optIn';
+    final bool isPushEnabled = await _channel.invokeMethod('optIn', [optIn]);
+    return 'OptIn set to: $isPushEnabled opted in device with value $optIn';
   }
 
   static Future<bool> isPushEnabled() async {

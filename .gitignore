@@ -27,3 +27,6 @@ doc/api/
 /.idea/libraries/Flutter_Plugins.xml
 /.idea/libraries/Dart_SDK.xml
 /.idea/.gitignore
+/android/.idea/.name
+/android/.idea/gradle.xml
+/android/.idea/misc.xml

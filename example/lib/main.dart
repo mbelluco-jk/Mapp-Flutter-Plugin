@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:flutter/services.dart';
-import 'package:mapp_sdk/mapp_sdk.dart';
 import 'package:mapp_sdk/helper_classes.dart';
+import 'package:mapp_sdk/mapp_sdk.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -48,6 +48,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
+        Config.appID, Config.tenantID);
+        
     initPlatformState();
   }
 
@@ -191,6 +195,8 @@ class _HomePageState extends State<HomePage> {
     if (_screens[index] == "Engage") {
       MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
           Config.appID, Config.tenantID);
+      print(
+          "ENGAGE WITH PARAMS: SDK_KEY: ${Config.sdkKey}, Server: ${Config.server.toString()}, APP_ID: ${Config.appID}, TENANT_ID: ${Config.tenantID}");
     } else if (_screens[index] == "Set Device Alias") {
       if (_aliasToSetString?.isNotEmpty ?? false) {
         MappSdk.setAlias(_aliasToSetString!);
@@ -243,24 +249,27 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
-        Config.appID, Config.tenantID);
-
     MappSdk.didReceiveDeepLinkWithIdentifier = (dynamic arguments) =>
         didReceiveDeepLinkWithIdentifierHandler(arguments);
+
     MappSdk.didReceiveInappMessageWithIdentifier = (dynamic arguments) =>
         didReceiveInappMessageWithIdentifierHandler(arguments);
+
     MappSdk.didReceiveCustomLinkWithIdentifier = (dynamic arguments) =>
         didReceiveCustomLinkWithIdentifierHandler(arguments);
+
     MappSdk.didReceiveInBoxMessages =
         (dynamic arguments) => didReceiveInBoxMessagesHandler(arguments);
+
     MappSdk.inAppCallFailedWithResponse =
         (dynamic arguments) => inAppCallFailedWithResponseHandler(arguments);
+
     MappSdk.didReceiveInBoxMessage =
         (dynamic arguments) => didReceiveInBoxMessageHandler(arguments);
 
     MappSdk.handledRemoteNotification =
         (dynamic arguments) => remoteNotificationHandler(arguments);
+
     MappSdk.handledRichContent =
         (dynamic arguments) => richContentHandler(arguments);
 
