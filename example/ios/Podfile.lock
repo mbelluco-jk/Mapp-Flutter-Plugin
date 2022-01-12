@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - mapp_sdk (0.0.1):
+  - mapp_sdk (0.0.2):
     - Flutter
     - MappSDK (= 6.0.5.1)
     - MappSDKInapp (= 6.0.6.8)
