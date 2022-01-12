@@ -27,9 +27,9 @@ static FlutterMethodChannel *channel;
     InAppMessageDelegate* inAppMessageDelegate = [[InAppMessageDelegate alloc] initWith:channel];
     [[PushMessageDelegate sharedObject] initWith:channel];
     [[PushMessageDelegate sharedObject] addNotificationListeners];
-    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:(id)[PushMessageDelegate sharedObject] with:TEST];
+    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:(id)[PushMessageDelegate sharedObject] with:severNumber];
     [inAppMessageDelegate addNotificationListeners];
-    [[AppoxeeInapp shared] engageWithDelegate:inAppMessageDelegate with:tEST];
+    [[AppoxeeInapp shared] engageWithDelegate:inAppMessageDelegate with:severNumber];
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     NSNumber *value = call.arguments[0];
     [[Appoxee shared] setPostponeNotificationRequest:[value boolValue]];
