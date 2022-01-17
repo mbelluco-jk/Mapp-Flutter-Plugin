@@ -1,43 +1,75 @@
 package com.example.mapp_sdk;
 
+import static com.example.mapp_sdk.MappSdkPlugin.MAPP_CHANNEL_NAME;
+
 import android.content.Context;
 import android.content.Intent;
 
+import com.appoxee.internal.logger.Logger;
 import com.appoxee.internal.logger.LoggerFactory;
 import com.appoxee.push.PushData;
 import com.appoxee.push.PushDataReceiver;
 
-import java.util.Map;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.dart.DartExecutor;
+import io.flutter.plugin.common.MethodChannel;
 
 public class PushBroadcastReceiver extends PushDataReceiver {
-    private final EventEmitter eventEmitter=EventEmitter.getInstance();
+    private final Logger devLogger = LoggerFactory.getDevLogger();
+
+    private MethodChannel backgroundMethodChannel;
+
+    @Override
+    public void onBroadcastReceived(Context context, Intent intent) {
+        super.onBroadcastReceived(context, intent);
+        devLogger.d(intent);
+        if (EventEmitter.getInstance().getChannel() == null) {
+            FlutterEngine flutterEngine = new FlutterEngine(context, null);
+            DartExecutor executor = flutterEngine.getDartExecutor();
+            backgroundMethodChannel = new MethodChannel(executor.getBinaryMessenger(), MAPP_CHANNEL_NAME);
+
+            //exception is thrown on flutter side when methodCallHandler not set, even empty one!
+            backgroundMethodChannel.setMethodCallHandler(((call, result) -> {
+            }));
+            executor.executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
+
+            // initialize plugin
+            flutterEngine.getBroadcastReceiverControlSurface().attachToBroadcastReceiver(this, null);
+
+            EventEmitter.getInstance().attachChannel(backgroundMethodChannel);
+        }
+    }
 
     @Override
     public void onPushReceived(PushData pushData) {
         super.onPushReceived(pushData);
-        LoggerFactory.getDevLogger().d("onPushReceived!!!");
+        devLogger.d(pushData);
 
-        //eventEmitter.sendEvent(new PushNotificationEvent(pushData,"onPushReceived"));
-        eventEmitter.sendEvent(new PushNotificationEvent(pushData,"handledRemoteNotification"));
-
-        //eventEmitter.sendEvent(new PushDeepLinkEvent(pushData,"didReceiveDeepLinkWithIdentifier"));
+        EventEmitter.getInstance()
+                .sendEvent(new PushNotificationEvent(pushData, "handledRemoteNotification"));
     }
 
     @Override
     public void onPushOpened(PushData pushData) {
         super.onPushOpened(pushData);
-        eventEmitter.sendEvent(new PushNotificationEvent(pushData,"onPushOpened"));
+        devLogger.d(pushData);
+
+        EventEmitter.getInstance()
+                .sendEvent(new PushNotificationEvent(pushData, "handledPushOpen"));
     }
 
     @Override
     public void onPushDismissed(PushData pushData) {
         super.onPushDismissed(pushData);
-        eventEmitter.sendEvent(new PushNotificationEvent(pushData, "onPushDismissed"));
+        EventEmitter.getInstance()
+                .sendEvent(new PushNotificationEvent(pushData, "handledPushDismiss"));
     }
 
     @Override
     public void onSilentPush(PushData pushData) {
         super.onSilentPush(pushData);
-        eventEmitter.sendEvent(new PushNotificationEvent(pushData, "onSilentPush"));
+        EventEmitter.getInstance()
+                .sendEvent(new PushNotificationEvent(pushData, "handledPushSilent"));
     }
+
 }

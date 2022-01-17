@@ -8,11 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PushDeepLinkEvent implements Event{
-
-    private static final String DEEP_LINK_RECEIVED_EVENT = "didReceiveDeepLinkWithIdentifier";//"com.mapp.deep_link_received";
-
-    private PushData pushData;
-    private String type;
+    private final PushData pushData;
+    private final String type;
 
     public PushDeepLinkEvent(PushData pushData, String type) {
         this.pushData = pushData;
@@ -22,19 +19,25 @@ public class PushDeepLinkEvent implements Event{
     @NonNull
     @Override
     public String getName() {
-        return DEEP_LINK_RECEIVED_EVENT;
+        return type;
     }
 
     @NonNull
     @Override
     public Map<String, Object> getBody() {
         Map<String, Object> deepLink = new HashMap<>();
-        String url = pushData.extraFields.containsKey("apx_dpl") ? pushData.extraFields.get("apx_dpl") : null;
+        String actionUri=pushData.actionUri.toString();
+        if(actionUri.contains("apx_dpl")){
+            deepLink.put("url", actionUri.replaceAll("apx_dpl",""));
+            deepLink.put("action",String.valueOf(pushData.id));
+            deepLink.put("event_trigger","");
+        }
+/*        String url = pushData.extraFields.containsKey("apx_dpl") ? pushData.extraFields.get("apx_dpl") : null;
         if(url!=null && !url.isEmpty()) {
-            deepLink.put("action", pushData.id);
+            deepLink.put("action", String.valueOf(pushData.id));
             deepLink.put("url", url);
             deepLink.put("event_trigger", "");
-        }
+        }*/
         return deepLink;
     }
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void callbackDispatcher() {
-  const MethodChannel _backgroundChannel = MethodChannel('map_sdk');
+  const MethodChannel _backgroundChannel = MethodChannel('mapp_sdk');
   WidgetsFlutterBinding.ensureInitialized();
 
   _backgroundChannel.setMethodCallHandler((MethodCall call) async {

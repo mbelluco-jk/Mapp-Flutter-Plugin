@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:mapp_sdk/mapp_sdk.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -51,7 +53,7 @@ class _HomePageState extends State<HomePage> {
 
     MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
         Config.appID, Config.tenantID);
-        
+
     initPlatformState();
   }
 
@@ -95,20 +97,36 @@ class _HomePageState extends State<HomePage> {
     print(arguments);
   }
 
+  void pushOpenedHandler(dynamic arguments) {
+    print("Push opened!");
+    print(arguments);
+  }
+
+  void pushDismissedHandler(dynamic arguments) {
+    print("Push dismissed!");
+    print(arguments);
+  }
+
+  void pushSilentHandler(dynamic arguments) {
+    print("Push silent!");
+    print(arguments);
+  }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String? platformVersion;
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       platformVersion = await MappSdk.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
 
     setState(() {
       _platformVersion = platformVersion;
@@ -272,6 +290,15 @@ class _HomePageState extends State<HomePage> {
 
     MappSdk.handledRichContent =
         (dynamic arguments) => richContentHandler(arguments);
+
+    MappSdk.handledPushOpen =
+        (dynamic arguments) => pushOpenedHandler(arguments);
+
+    MappSdk.handledPushDismiss =
+        (dynamic arguments) => pushDismissedHandler(arguments);
+
+    MappSdk.handledPushSilent =
+        (dynamic arguments) => pushSilentHandler(arguments);
 
     return MaterialApp(
       home: Scaffold(

@@ -10,13 +10,11 @@ public interface Event {
      * The event name.
      * @return The event name.
      */
-    @NonNull
     String getName();
 
     /**
      * The event body.
      * @return The event body.
      */
-    @NonNull
     Map<String, Object> getBody();
 }

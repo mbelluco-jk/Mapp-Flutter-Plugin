@@ -27,6 +27,11 @@ class MappSdk {
   static late void Function(dynamic) handledRemoteNotification;
   static late void Function(dynamic) handledRichContent;
 
+  //android push message handlers
+  static late void Function(dynamic) handledPushOpen;
+  static late void Function(dynamic) handledPushDismiss;
+  static late void Function(dynamic) handledPushSilent;
+
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
       print(call.method);
@@ -56,6 +61,15 @@ class MappSdk {
         case 'handledRichContent':
           handledRichContent(call.arguments);
           break;
+        case 'handledPushOpen':
+          handledPushOpen(call.arguments);
+          break;
+        case 'handledPushDismiss':
+          handledPushDismiss(call.arguments);
+          break;
+        case 'handledPushSilent':
+          handledPushSilent(call.arguments);
+          break;
         default:
           print('Unknowm method ${call.method} ');
       }
@@ -65,9 +79,9 @@ class MappSdk {
     return Future.value();
   }
 
-  static Future<String?> get platformVersion async {
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
+  static Future<String> get platformVersion async {
+    String? version = await _channel.invokeMethod('getPlatformVersion');
+    return version ?? "unknown";
   }
 
   static Future<String?> engage(String sdkKey, String googleProjectId,

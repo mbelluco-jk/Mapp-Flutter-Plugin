@@ -7,9 +7,6 @@ import com.appoxee.push.PushData;
 import java.util.Map;
 
 public class PushNotificationEvent implements Event {
-
-    private static final String PUSH_RECEIVED_EVENT = "handledRemoteNotification";//"com.mapp.rich_message_received";
-
     private final PushData message;
     private final String type;
 
@@ -21,7 +18,7 @@ public class PushNotificationEvent implements Event {
     @NonNull
     @Override
     public String getName() {
-        return PUSH_RECEIVED_EVENT;
+        return type;
     }
 
     @NonNull

@@ -1,7 +1,5 @@
 package com.example.mapp_sdk;
 
-import android.app.Application;
-
 import androidx.annotation.NonNull;
 
 import com.appoxee.Appoxee;
@@ -9,8 +7,6 @@ import com.appoxee.push.fcm.MappMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.concurrent.TimeUnit;
-
-import io.flutter.plugin.common.MethodChannel;
 
 public class MappFlutterMessagingService extends MappMessagingService {
 

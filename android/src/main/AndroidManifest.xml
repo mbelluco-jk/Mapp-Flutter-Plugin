@@ -7,7 +7,9 @@
 
     <application>
         <activity android:name=".ActivityListener"
-            android:exported="true"
+            android:exported="false"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:theme="@style/TransparentActivity">
             <intent-filter>
                 <action android:name="com.mapp.RICH_PUSH" />
@@ -18,7 +20,10 @@
         </activity>
         <activity
             android:name=".HelperActivity"
-            android:exported="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:theme="@style/TransparentActivity">
 
             <intent-filter android:label="mapp">
@@ -35,10 +40,11 @@
             </intent-filter>
 
         </activity>
+
         <receiver
             android:name=".PushBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.appoxee.PUSH_OPENED" />
                 <action android:name="com.appoxee.PUSH_RECEIVED" />
@@ -54,7 +60,7 @@
             </intent-filter>
         </receiver>
         <service android:name="com.appoxee.push.fcm.MappMessagingService"
-            android:exported="true"
+            android:exported="false"
             tools:node="remove">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

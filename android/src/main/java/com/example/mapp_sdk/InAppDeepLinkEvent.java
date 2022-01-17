@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class InAppDeepLinkEvent implements Event {
 
-    private static final String IN_APP_DEEP_LINK_RECEIVED_EVENT = "didReceiveInappMessageWithIdentifier";//"com.mapp.deep_link_received";
+    private static final String IN_APP_DEEP_LINK_RECEIVED_EVENT = "didReceiveDeepLinkWithIdentifier";//"com.mapp.deep_link_received";
 
     @Override
     public String getName() {

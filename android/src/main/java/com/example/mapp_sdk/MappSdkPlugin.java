@@ -9,49 +9,50 @@ import com.appoxee.Appoxee;
 import com.appoxee.AppoxeeOptions;
 import com.appoxee.DeviceInfo;
 import com.appoxee.RequestStatus;
+import com.appoxee.internal.logger.Logger;
 import com.appoxee.internal.logger.LoggerFactory;
 import com.appoxee.push.NotificationMode;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import io.flutter.embedding.engine.loader.FlutterLoader;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.embedding.engine.plugins.broadcastreceiver.BroadcastReceiverAware;
+import io.flutter.embedding.engine.plugins.broadcastreceiver.BroadcastReceiverPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.view.FlutterMain;
 
 /**
  * MappSdkPlugin
  */
 public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
-    public static final String GET_PLATFORM_VERSION="getPlatformVersion";
-    public static final String ENGAGE="engage";
-    public static final String SET_DEVICE_ALIAS="setDeviceAlias";
-    public static final String GET_DEVICE_ALIAS="getDeviceAlias";
-    public static final String IS_PUSH_ENABLED="isPushEnabled";
-    public static final String OPT_IN="optIn";
-    public static final String TRIGGER_IN_APP="triggerInApp";
-    public static final String IS_READY="isReady";
-    public static final String GET_DEVICE_INFO="getDeviceInfo";
-    public static final String FETCH_INBOX_MESSAGE="fetchInboxMessage";
-    public static final String FETCH_INBOX_MESSAGES="fetchInboxMessages";
-    public static final String GET_FCM_TOKEN="getFcmToken";
-    public static final String SET_TOKEN="setToken";
-    public static final String START_GEOFENCING="startGeofencing";
-    public static final String STOP_GEOFENCING="stopGeofencing";
-    public static final String ADD_TAG="addTag";
-    public static final String FETCH_DEVICE_TAGS="fetchDeviceTags";
-    public static final String LOGOUT_WITH_OPT_IN="logoutWithOptin";
-    public static final String IS_DEVICE_REGISTERED="isDeviceRegistered";
-    public static final String SET_REMOTE_MESSAGE="setRemoteMessage";
+    public static final String MAPP_CHANNEL_NAME = "mapp_sdk";
+
+    public static final String GET_PLATFORM_VERSION = "getPlatformVersion";
+    public static final String ENGAGE = "engage";
+    public static final String SET_DEVICE_ALIAS = "setDeviceAlias";
+    public static final String GET_DEVICE_ALIAS = "getDeviceAlias";
+    public static final String IS_PUSH_ENABLED = "isPushEnabled";
+    public static final String OPT_IN = "optIn";
+    public static final String TRIGGER_IN_APP = "triggerInApp";
+    public static final String IS_READY = "isReady";
+    public static final String GET_DEVICE_INFO = "getDeviceInfo";
+    public static final String FETCH_INBOX_MESSAGE = "fetchInboxMessage";
+    public static final String FETCH_INBOX_MESSAGES = "fetchInboxMessages";
+    public static final String GET_FCM_TOKEN = "getFcmToken";
+    public static final String SET_TOKEN = "setToken";
+    public static final String START_GEOFENCING = "startGeofencing";
+    public static final String STOP_GEOFENCING = "stopGeofencing";
+    public static final String ADD_TAG = "addTag";
+    public static final String FETCH_DEVICE_TAGS = "fetchDeviceTags";
+    public static final String LOGOUT_WITH_OPT_IN = "logoutWithOptin";
+    public static final String IS_DEVICE_REGISTERED = "isDeviceRegistered";
+    public static final String SET_REMOTE_MESSAGE = "setRemoteMessage";
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
@@ -62,20 +63,20 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private Activity activity;
     private Result result;
 
-    private final FlutterLoader flutterLoader=new FlutterLoader();
+    private final Logger devLogger = LoggerFactory.getDevLogger();
 
-    private final Appoxee.OnInitCompletedListener onInitCompletedListener=new Appoxee.OnInitCompletedListener() {
+    private final Appoxee.OnInitCompletedListener onInitCompletedListener = new Appoxee.OnInitCompletedListener() {
         @Override
         public void onInitCompleted(boolean successful, Exception failReason) {
-            if(result!=null){
-                if(successful){
+            if (result != null) {
+                if (successful) {
                     Appoxee.instance().getDeviceInfoDMC();
                     DeviceInfo info = Appoxee.instance().getDeviceInfo();
-                    LoggerFactory.getDevLogger().d("DEVICE INFO: "+info);
+                    devLogger.d("DEVICE INFO: " + info);
                     result.success(info.sdkVersion);
                 }
-                if(failReason!=null){
-                    result.error("engage",failReason.getMessage(),null);
+                if (failReason != null) {
+                    result.error("engage", failReason.getMessage(), null);
                 }
             }
         }
@@ -83,20 +84,17 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), MappChannelHolder.MAPP_CHANNEL_NAME);
+        devLogger.d("attached to engine");
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), MAPP_CHANNEL_NAME);
         application = (Application) flutterPluginBinding.getApplicationContext();
-        MappChannelHolder.setChannel(channel);
+
         EventEmitter.getInstance().attachChannel(channel);
-        //channel.setMethodCallHandler(this);
     }
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         List<Object> args = call.arguments();
-
-        //flutterLoader.startInitialization(application);
-        //flutterLoader.ensureInitializationComplete(application,new String[]{});
-
+        devLogger.d("method: " + call.method);
         switch (call.method) {
             case GET_PLATFORM_VERSION:
                 result.success("Android " + android.os.Build.VERSION.RELEASE);
@@ -127,7 +125,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                 getDeviceInfo(result);
                 break;
             case FETCH_INBOX_MESSAGE:
-                int templateId=args!=null && args.size()>0 ? (Integer) args.get(0) :-1;
+                int templateId = args != null && args.size() > 0 ? (Integer) args.get(0) : -1;
                 fetchInboxMessage(templateId, result);
                 break;
             case FETCH_INBOX_MESSAGES:
@@ -169,8 +167,8 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        devLogger.d("detached from engine");
         channel.setMethodCallHandler(null);
-        MappChannelHolder.setChannel(null);
         EventEmitter.getInstance().detachChannel();
         application = null;
     }
@@ -184,9 +182,9 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             options.server = getServerByIndex((Integer) args.get(2));
             options.appID = (String) args.get(3);
             options.tenantID = (String) args.get(4);
-            options.notificationMode= NotificationMode.BACKGROUND_AND_FOREGROUND;
+            options.notificationMode = NotificationMode.BACKGROUND_AND_FOREGROUND;
             Appoxee.engage(application, options);
-            this.result=result;
+            this.result = result;
             Appoxee.instance().addInitListener(onInitCompletedListener);
             Appoxee.instance().setReceiver(PushBroadcastReceiver.class);
         } catch (Exception e) {
@@ -367,25 +365,29 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-        this.activity=binding.getActivity();
+        devLogger.d("attached to activity");
+        this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        this.activity=null;
+        devLogger.d("detached from activity");
+        this.activity = null;
         this.channel.setMethodCallHandler(null);
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        this.activity=binding.getActivity();
+        devLogger.d("reattached to activity on config changes");
+        this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
     }
 
     @Override
     public void onDetachedFromActivity() {
-        this.activity=null;
+        devLogger.d("detached from activity");
+        this.activity = null;
         this.channel.setMethodCallHandler(null);
     }
 }
