@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.mapp_sdk_example">
    <application
-        android:label="mapp_sdk_example"
+        android:label="Mapp flutter"
         android:icon="@mipmap/ic_launcher"
        android:theme="@style/AppTheme"
        tools:replace="android:label">
