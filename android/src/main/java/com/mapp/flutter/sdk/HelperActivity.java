@@ -50,14 +50,17 @@ public class HelperActivity extends Activity {
             Event event = new InAppDeepLinkEvent(data, "didReceiveDeepLinkWithIdentifier");
 
             if (name != null && Objects.equals(name.getPackageName(), packageName)) {
-                if (action!=null && !action.isEmpty() && data != null) {
+                if (action != null && !action.isEmpty() && data != null) {
                     startMainActivity(intent, packageName);
                     if (event.getBody() != null && !event.getBody().isEmpty())
-                        EventEmitter.getInstance().sendEvent(event);
+                        handler.postDelayed(()->{
+                            EventEmitter.getInstance().sendEvent(event);
+                        },1000);
+
                 }
             }
         }
-        handler.postDelayed(this::finish, 500);
+        handler.postDelayed(this::finish, 2000);
     }
 
     private void startMainActivity(Intent intent, String packageName) {

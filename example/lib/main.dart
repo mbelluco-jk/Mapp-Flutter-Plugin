@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           primaryColorDark: const Color(0xFF0592D7),
           accentColor: const Color(0xFF58585A),
           cardColor: const Color(0xFF888888)),
-      home: HomePage2(),
+      home: const HomePage(),
     );
   }
 }

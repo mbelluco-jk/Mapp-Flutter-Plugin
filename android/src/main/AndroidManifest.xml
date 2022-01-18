@@ -7,7 +7,10 @@
 
     <application>
         <activity android:name="com.mapp.flutter.sdk.ActivityListener"
-            android:exported="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:theme="@style/TransparentActivity">
             <intent-filter>
                 <action android:name="com.mapp.RICH_PUSH" />

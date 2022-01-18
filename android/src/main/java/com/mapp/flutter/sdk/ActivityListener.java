@@ -13,7 +13,7 @@ import com.appoxee.internal.logger.LoggerFactory;
 
 import io.flutter.embedding.android.FlutterActivity;
 
-public class ActivityListener extends FlutterActivity {
+public class ActivityListener extends Activity {
 
     private final Logger devLogger= LoggerFactory.getDevLogger();
     private final Handler handler=new Handler(Looper.getMainLooper());
@@ -31,7 +31,7 @@ public class ActivityListener extends FlutterActivity {
         handler.postDelayed(() -> {
             Appoxee.handleRichPush(Appoxee.instance().getLastActivity(), getIntent());
             finish();
-        }, 1000);
+        }, 2000);
     }
 
     @Override

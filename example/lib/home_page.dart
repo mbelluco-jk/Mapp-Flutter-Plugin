@@ -9,14 +9,14 @@ import 'package:mapp_sdk_example/deep_link_page.dart';
 import 'package:mapp_sdk/mapp_sdk.dart';
 import 'package:mapp_sdk/helper_classes.dart';
 
-class HomePage2 extends StatefulWidget {
-  const HomePage2({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage2> {
+class _HomePageState extends State<HomePage> {
   String? _platformVersion = 'Unknown';
   String? _aliasToSetString = '';
   String? _tagToSetString = '';
