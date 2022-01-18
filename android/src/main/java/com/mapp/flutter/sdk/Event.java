@@ -1,6 +1,4 @@
-package com.example.mapp_sdk;
-
-import androidx.annotation.NonNull;
+package com.mapp.flutter.sdk;
 
 import java.util.Map;
 

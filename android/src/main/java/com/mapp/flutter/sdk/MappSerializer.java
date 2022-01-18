@@ -1,7 +1,11 @@
-package com.example.mapp_sdk;
+package com.mapp.flutter.sdk;
 
 import com.appoxee.DeviceInfo;
+import com.appoxee.internal.inapp.model.APXInboxMessage;
+import com.appoxee.internal.inapp.model.ApxInAppExtras;
 import com.appoxee.push.PushData;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,5 +58,34 @@ public class MappSerializer {
         }
 
         return map;
+    }
+
+    public static JSONObject messageToJson(APXInboxMessage msg) {
+        JSONObject msgJson=new JSONObject();
+
+        try {
+            msgJson.put("templateId", msg.getTemplateId());
+            msgJson.put("title", msg.getContent());
+            msgJson.put("eventId", msg.getEventId());
+            if (msg.getExpirationDate() != null)
+                msgJson.put("expirationDate", msg.getExpirationDate().toString());
+            if (msg.getIconUrl() != null)
+                msgJson.put("iconURl", msg.getIconUrl());
+            if (msg.getStatus() != null)
+                msgJson.put("status", msg.getStatus());
+            if (msg.getSubject() != null)
+                msgJson.put("subject", msg.getSubject());
+            if (msg.getSummary() != null)
+                msgJson.put("summary", msg.getSummary());
+            if (msg.getExtras() != null)
+                for (ApxInAppExtras apxInAppExtras : msg.getExtras())
+                    msgJson.put(apxInAppExtras.getName(), apxInAppExtras.getValue());
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return msgJson;
     }
 }

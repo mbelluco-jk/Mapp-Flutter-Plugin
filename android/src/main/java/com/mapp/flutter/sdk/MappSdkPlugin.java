@@ -1,4 +1,4 @@
-package com.example.mapp_sdk;
+package com.mapp.flutter.sdk;
 
 import android.app.Activity;
 import android.app.Application;
@@ -9,9 +9,14 @@ import com.appoxee.Appoxee;
 import com.appoxee.AppoxeeOptions;
 import com.appoxee.DeviceInfo;
 import com.appoxee.RequestStatus;
+import com.appoxee.internal.inapp.model.APXInboxMessage;
+import com.appoxee.internal.inapp.model.InAppInboxCallback;
 import com.appoxee.internal.logger.Logger;
 import com.appoxee.internal.logger.LoggerFactory;
 import com.appoxee.push.NotificationMode;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Set;
@@ -19,8 +24,6 @@ import java.util.Set;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
-import io.flutter.embedding.engine.plugins.broadcastreceiver.BroadcastReceiverAware;
-import io.flutter.embedding.engine.plugins.broadcastreceiver.BroadcastReceiverPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -53,6 +56,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     public static final String LOGOUT_WITH_OPT_IN = "logoutWithOptin";
     public static final String IS_DEVICE_REGISTERED = "isDeviceRegistered";
     public static final String SET_REMOTE_MESSAGE = "setRemoteMessage";
+    public static final String REMOVE_BADGE_NUMBER = "removeBadgeNumber";
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
@@ -159,6 +163,9 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                 // TODO get remoteMessage and pass data to a native part
                 // setRemoteMessage(null,result);
                 break;
+            case REMOVE_BADGE_NUMBER:
+                removeBadgeNumber(result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -262,6 +269,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private void fetchInboxMessage(int template, @NonNull Result result) {
         try {
             Appoxee.instance().fetchInboxMessage(activity, template);
+            handleInAppInboxMessages(result);
         } catch (Exception e) {
             result.error("fetchInboxMessage", e.getMessage(), null);
         }
@@ -270,6 +278,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private void fetchInboxMessages(@NonNull Result result) {
         try {
             Appoxee.instance().fetchInboxMessages(activity);
+            handleInAppInboxMessages(result);
         } catch (Exception e) {
             result.error("fetchInboxMessages", e.getMessage(), null);
         }
@@ -333,7 +342,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private void logOut(boolean pushEnabled, @NonNull Result result) {
         try {
             Appoxee.instance().logOut(application, pushEnabled);
-            result.success(true);
+            result.success("logged out with 'PushEnabled' status: " + pushEnabled);
         } catch (Exception e) {
             result.error("logOut", e.getMessage(), null);
         }
@@ -346,6 +355,10 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         } catch (Exception e) {
             result.error("isDeviceRegistered", e.getMessage(), null);
         }
+    }
+
+    private void removeBadgeNumber(@NonNull Result result) {
+        Appoxee.removeBadgeNumber(application.getApplicationContext());
     }
 
 //    private void setRemoteMessage(RemoteMessage remoteMessage, @NonNull Result result) {
@@ -361,6 +374,27 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             throw new IndexOutOfBoundsException("Server must be one of the following: L3 [0], L3_US [1], EMC [2], EMC_US [3], CROC [4], TEST [5], TEST55 [6] and proper index provided.");
         }
         return AppoxeeOptions.Server.values()[index];
+    }
+
+    private void handleInAppInboxMessages(@NonNull Result result) {
+        InAppInboxCallback inAppInboxCallback = new InAppInboxCallback();
+        inAppInboxCallback.addInAppInboxMessagesReceivedCallback(new InAppInboxCallback.onInAppInboxMessagesReceived() {
+            @Override
+            public void onInAppInboxMessages(List<APXInboxMessage> messages) {
+                JSONArray array = new JSONArray();
+                for (APXInboxMessage message : messages) {
+                    JSONObject json = MappSerializer.messageToJson(message);
+                    array.put(json);
+                }
+                result.success(array.toString());
+            }
+
+            @Override
+            public void onInAppInboxMessage(APXInboxMessage message) {
+                JSONObject json = MappSerializer.messageToJson(message);
+                result.success(json.toString());
+            }
+        });
     }
 
     @Override

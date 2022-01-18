@@ -32,7 +32,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.mapp_sdk
+        package: com.mapp.flutter.sdk
         pluginClass: MappSdkPlugin
       ios:
         pluginClass: MappSdkPlugin

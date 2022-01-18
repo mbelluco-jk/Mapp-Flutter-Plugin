@@ -1,6 +1,4 @@
-package com.example.mapp_sdk;
-
-import static com.example.mapp_sdk.MappSdkPlugin.MAPP_CHANNEL_NAME;
+package com.mapp.flutter.sdk;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +24,7 @@ public class PushBroadcastReceiver extends PushDataReceiver {
         if (EventEmitter.getInstance().getChannel() == null) {
             FlutterEngine flutterEngine = new FlutterEngine(context, null);
             DartExecutor executor = flutterEngine.getDartExecutor();
-            backgroundMethodChannel = new MethodChannel(executor.getBinaryMessenger(), MAPP_CHANNEL_NAME);
+            backgroundMethodChannel = new MethodChannel(executor.getBinaryMessenger(), MappSdkPlugin.MAPP_CHANNEL_NAME);
 
             //exception is thrown on flutter side when methodCallHandler not set, even empty one!
             backgroundMethodChannel.setMethodCallHandler(((call, result) -> {

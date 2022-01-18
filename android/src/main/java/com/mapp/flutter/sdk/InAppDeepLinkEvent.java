@@ -1,4 +1,4 @@
-package com.example.mapp_sdk;
+package com.mapp.flutter.sdk;
 import android.net.Uri;
 
 import java.util.HashMap;

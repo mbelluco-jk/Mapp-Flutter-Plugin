@@ -1,4 +1,4 @@
-package com.example.mapp_sdk;
+package com.mapp.flutter.sdk;
 
 import android.os.Handler;
 import android.os.Looper;

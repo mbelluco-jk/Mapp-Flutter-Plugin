@@ -1,4 +1,4 @@
-group 'com.mapp.flutter-plugin'
+group 'com.mapp.flutter.sdk'
 version '1.0'
 
 buildscript {

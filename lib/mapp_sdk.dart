@@ -120,9 +120,9 @@ class MappSdk {
   }
 
   static Future<String?> logOut(bool pushEnabled) async {
-    final String? version =
+    final String? result =
         await _channel.invokeMethod('logoutWithOptin', [pushEnabled]);
-    return 'successfull $version logged out with status $pushEnabled';
+    return result;
   }
 
   static Future<String?> setAlias(String alias) async {
