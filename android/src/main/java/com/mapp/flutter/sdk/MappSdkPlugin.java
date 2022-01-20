@@ -2,6 +2,7 @@ package com.mapp.flutter.sdk;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
@@ -34,29 +35,8 @@ import io.flutter.plugin.common.MethodChannel.Result;
  */
 public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
+    public static final String ENGINE_ID = "MappSdkPluggin";
     public static final String MAPP_CHANNEL_NAME = "mapp_sdk";
-
-    public static final String GET_PLATFORM_VERSION = "getPlatformVersion";
-    public static final String ENGAGE = "engage";
-    public static final String SET_DEVICE_ALIAS = "setDeviceAlias";
-    public static final String GET_DEVICE_ALIAS = "getDeviceAlias";
-    public static final String IS_PUSH_ENABLED = "isPushEnabled";
-    public static final String OPT_IN = "optIn";
-    public static final String TRIGGER_IN_APP = "triggerInApp";
-    public static final String IS_READY = "isReady";
-    public static final String GET_DEVICE_INFO = "getDeviceInfo";
-    public static final String FETCH_INBOX_MESSAGE = "fetchInboxMessage";
-    public static final String FETCH_INBOX_MESSAGES = "fetchInboxMessages";
-    public static final String GET_FCM_TOKEN = "getFcmToken";
-    public static final String SET_TOKEN = "setToken";
-    public static final String START_GEOFENCING = "startGeofencing";
-    public static final String STOP_GEOFENCING = "stopGeofencing";
-    public static final String ADD_TAG = "addTag";
-    public static final String FETCH_DEVICE_TAGS = "fetchDeviceTags";
-    public static final String LOGOUT_WITH_OPT_IN = "logoutWithOptin";
-    public static final String IS_DEVICE_REGISTERED = "isDeviceRegistered";
-    public static final String SET_REMOTE_MESSAGE = "setRemoteMessage";
-    public static final String REMOVE_BADGE_NUMBER = "removeBadgeNumber";
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
@@ -89,9 +69,8 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         devLogger.d("attached to engine");
-        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), MAPP_CHANNEL_NAME);
         application = (Application) flutterPluginBinding.getApplicationContext();
-
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), MAPP_CHANNEL_NAME);
         EventEmitter.getInstance().attachChannel(channel);
     }
 
@@ -100,70 +79,70 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         List<Object> args = call.arguments();
         devLogger.d("method: " + call.method);
         switch (call.method) {
-            case GET_PLATFORM_VERSION:
+            case Method.GET_PLATFORM_VERSION:
                 result.success("Android " + android.os.Build.VERSION.RELEASE);
                 break;
-            case ENGAGE:
+            case Method.ENGAGE:
                 engage(args, result);
                 break;
-            case SET_DEVICE_ALIAS:
+            case Method.SET_DEVICE_ALIAS:
                 setDeviceAlias((String) args.get(0), result);
                 break;
-            case GET_DEVICE_ALIAS:
+            case Method.GET_DEVICE_ALIAS:
                 getDeviceAlias(result);
                 break;
-            case IS_PUSH_ENABLED:
+            case Method.IS_PUSH_ENABLED:
                 isPushEnabled(result);
                 break;
-            case OPT_IN:
+            case Method.OPT_IN:
                 boolean isEnabled = (boolean) args.get(0);
                 setPushEnabled(isEnabled, result);
                 break;
-            case TRIGGER_IN_APP:
+            case Method.TRIGGER_IN_APP:
                 triggerInApp((String) args.get(0), result);
                 break;
-            case IS_READY:
+            case Method.IS_READY:
                 isReady(result);
                 break;
-            case GET_DEVICE_INFO:
+            case Method.GET_DEVICE_INFO:
                 getDeviceInfo(result);
                 break;
-            case FETCH_INBOX_MESSAGE:
+            case Method.FETCH_INBOX_MESSAGE:
                 int templateId = args != null && args.size() > 0 ? (Integer) args.get(0) : -1;
                 fetchInboxMessage(templateId, result);
                 break;
-            case FETCH_INBOX_MESSAGES:
+            case Method.FETCH_INBOX_MESSAGES:
                 fetchInboxMessages(result);
                 break;
-            case GET_FCM_TOKEN:
+            case Method.GET_FCM_TOKEN:
                 getFcmToken(result);
                 break;
-            case SET_TOKEN:
+            case Method.SET_TOKEN:
                 setToken((String) args.get(0), result);
                 break;
-            case START_GEOFENCING:
+            case Method.START_GEOFENCING:
                 startGeoFencing(result);
                 break;
-            case STOP_GEOFENCING:
+            case Method.STOP_GEOFENCING:
                 stopGeoFencing(result);
                 break;
-            case ADD_TAG:
+            case Method.ADD_TAG:
                 addTag((String) args.get(0), result);
                 break;
-            case FETCH_DEVICE_TAGS:
+            case Method.FETCH_DEVICE_TAGS:
                 getTags(result);
                 break;
-            case LOGOUT_WITH_OPT_IN:
+            case Method.LOGOUT_WITH_OPT_IN:
                 logOut((Boolean) args.get(0), result);
                 break;
-            case IS_DEVICE_REGISTERED:
+            case Method.IS_DEVICE_REGISTERED:
                 isDeviceRegistered(result);
                 break;
-            case SET_REMOTE_MESSAGE:
+            case Method.SET_REMOTE_MESSAGE:
                 // TODO get remoteMessage and pass data to a native part
                 // setRemoteMessage(null,result);
                 break;
-            case REMOVE_BADGE_NUMBER:
+            case Method.REMOVE_BADGE_NUMBER:
                 removeBadgeNumber(result);
                 break;
             default:
@@ -341,7 +320,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     private void logOut(boolean pushEnabled, @NonNull Result result) {
         try {
-            Appoxee.instance().logOut(application, pushEnabled);
+            Appoxee.instance().logOut(pushEnabled);
             result.success("logged out with 'PushEnabled' status: " + pushEnabled);
         } catch (Exception e) {
             result.error("logOut", e.getMessage(), null);
@@ -406,22 +385,31 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        devLogger.d("detached from activity");
+        devLogger.d("detached from activity for config changes: " + (activity != null ? activity.getClass().getName() : "null"));
         this.activity = null;
         this.channel.setMethodCallHandler(null);
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        devLogger.d("reattached to activity on config changes");
+        devLogger.d("reattached to activity on config changes: "+binding.getActivity());
         this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
     }
 
     @Override
     public void onDetachedFromActivity() {
-        devLogger.d("detached from activity");
+        devLogger.d("detached from activity: " + (activity != null ? activity.getClass().getName() : "null"));
         this.activity = null;
         this.channel.setMethodCallHandler(null);
     }
+
+    public static void handleIntent(Activity activity, Intent intent) {
+        if (activity == null || intent == null) return;
+        Intent richIntent = intent.getParcelableExtra("intent");
+        if (richIntent != null && richIntent.getAction().equals(Action.RICH_PUSH)) {
+            Appoxee.handleRichPush(activity, richIntent);
+        }
+    }
+
 }

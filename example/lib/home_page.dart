@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   void didReceiveDeepLinkWithIdentifierHandler(dynamic arguments) {
     print("deep link received!");
     print(arguments);
-    HashMap<String,dynamic> map = HashMap.from(arguments);
+    HashMap<String, dynamic> map = HashMap.from(arguments);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DeepLinkPage(map: map)),
@@ -167,11 +167,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  final textHolder = TextEditingController(text: '');
+
+  clearText() {
+    textHolder.clear();
+  }
+
   Card _createTextFieldOrButton(int index) {
     switch (index) {
       case 0:
         return Card(
           child: TextFormField(
+            controller: textHolder,
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Enter alias'),
             onChanged: (String? value) {
@@ -196,6 +203,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void onTap(int index) {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (_screens[index] == "Engage") {
       MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
           Config.appID, Config.tenantID);
@@ -203,8 +211,7 @@ class _HomePageState extends State<HomePage> {
           "ENGAGE WITH PARAMS: SDK_KEY: ${Config.sdkKey}, Server: ${Config.server.toString()}, APP_ID: ${Config.appID}, TENANT_ID: ${Config.tenantID}");
     } else if (_screens[index] == "Set Device Alias") {
       if (_aliasToSetString?.isNotEmpty ?? false) {
-        MappSdk.setAlias(_aliasToSetString!)
-            .then((value) => _aliasToSetString = "");
+        MappSdk.setAlias(_aliasToSetString!).then((value) => clearText());
       } else {
         _showMyDialog('Alias', "Not set", "Alias can't be empty");
       }

@@ -51,7 +51,6 @@ public class PushBroadcastReceiver extends PushDataReceiver {
     public void onPushOpened(PushData pushData) {
         super.onPushOpened(pushData);
         devLogger.d(pushData);
-
         EventEmitter.getInstance()
                 .sendEvent(new PushNotificationEvent(pushData, "handledPushOpen"));
     }
