@@ -25,14 +25,14 @@ static FlutterMethodChannel *channel;
   } else if ([@"engage" isEqualToString:call.method]){
     NSNumber* serverNumber = call.arguments[2];
     NSLog(@"server: %@", serverNumber);
-    InAppMessageDelegate* inAppMessageDelegate = [[InAppMessageDelegate alloc] initWith:channel];
+    [[InAppMessageDelegate sharedObject] initWith:channel];
+    [[InAppMessageDelegate sharedObject] addNotificationListeners];
     [[PushMessageDelegate sharedObject] initWith:channel];
     [[PushMessageDelegate sharedObject] addNotificationListeners];
     SERVER serv = [self getServerKeyFor:serverNumber];
     [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:(id)[PushMessageDelegate sharedObject] with:serv];
-    [inAppMessageDelegate addNotificationListeners];
     INAPPSERVER inappServ = [self getInappServerKeyFor: serverNumber];
-    [[AppoxeeInapp shared] engageWithDelegate:inAppMessageDelegate with:inappServ];
+    [[AppoxeeInapp shared] engageWithDelegate:(id)[InAppMessageDelegate sharedObject] with:inappServ];
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     NSNumber *value = call.arguments[0];
     [[Appoxee shared] setPostponeNotificationRequest:[value boolValue]];

@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface InAppMessageDelegate : NSObject
 
--(instancetype)initWith:(FlutterMethodChannel*) channel;
+-(void)initWith:(FlutterMethodChannel*) channel;
++ (InAppMessageDelegate *)sharedObject;
 -(void) addNotificationListeners;
 
 @end

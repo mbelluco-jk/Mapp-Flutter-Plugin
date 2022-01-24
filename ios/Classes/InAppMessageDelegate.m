@@ -11,12 +11,18 @@
 
 @implementation InAppMessageDelegate
 
-- (instancetype)initWith:(FlutterMethodChannel *)channel {
-    if (!self) {
-        self = [super init];
-    }
++ (InAppMessageDelegate *)sharedObject {
+    static InAppMessageDelegate *sharedClass = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedClass = [[self alloc] init];
+    });
+    return sharedClass;
+}
+
+- (void)initWith:(FlutterMethodChannel *)channel {
     self.channel = channel;
-    return self;
+    NSLog(@"init inapp listers object!");
 }
 
 - (void)addNotificationListeners {
@@ -37,7 +43,8 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveInBoxMessageHandler:) name:@"didReceiveInBoxMessage" object:nil];
       
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didReceiveCustomLinkWithIdentifier" object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveCustomLinkWithIdentifierHandler:) name:@"didReceiveCustomLinkWithIdentifier" object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(didReceiveCustomLinkWithIdentifierHandler:) name:@"didReceiveCustomLinkWithIdentifier" object:nil];\
+    NSLog(@"notification listeners for inapp added!");
 }
 
 //selectors to forward data to flutter level
@@ -108,6 +115,7 @@ messageExtraData{
 
 - (void)didReceiveInBoxMessages:(NSArray *_Nullable)messages{
   NSMutableArray *dicts = [[NSMutableArray alloc] init];
+  NSLog(@"inbox messages: %@", messages);
     for(APXInBoxMessage *message in messages) {
         [dicts addObject:[message getDictionary]];
     }

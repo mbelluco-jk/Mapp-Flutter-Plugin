@@ -27,7 +27,7 @@
             NSArray *categoryExistArray = [categories allObjects];
             BOOL alreadyExistCat = NO;
             for (UNNotificationCategory *category in categoryExistArray) {
-                if (category.identifier == self.bestAttemptContent.categoryIdentifier) {
+                if ([category.identifier isEqual:  self.bestAttemptContent.categoryIdentifier]) {
                     alreadyExistCat = YES;
                 }
             }

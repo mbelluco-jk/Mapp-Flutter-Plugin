@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
   void didReceiveInBoxMessagesHandler(dynamic arguments) {
     print("Inbox Messages received!");
     print(arguments);
+    _showMyDialog("Inbox messages", "", jsonEncode(arguments));
   }
 
   void inAppCallFailedWithResponseHandler(dynamic arguments) {
