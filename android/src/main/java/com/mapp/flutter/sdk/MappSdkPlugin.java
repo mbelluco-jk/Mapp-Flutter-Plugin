@@ -1,5 +1,7 @@
 package com.mapp.flutter.sdk;
 
+import static com.appoxee.internal.ui.UiUtils.getInAppStatisticsRequestObject;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import com.appoxee.DeviceInfo;
 import com.appoxee.RequestStatus;
 import com.appoxee.internal.inapp.model.APXInboxMessage;
 import com.appoxee.internal.inapp.model.InAppInboxCallback;
+import com.appoxee.internal.inapp.model.InAppStatistics;
 import com.appoxee.internal.logger.Logger;
 import com.appoxee.internal.logger.LoggerFactory;
 import com.appoxee.push.NotificationMode;
@@ -75,9 +78,19 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     }
 
     @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        devLogger.d("detached from engine");
+        channel.setMethodCallHandler(null);
+        EventEmitter.getInstance().detachChannel();
+        application = null;
+    }
+
+    @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         List<Object> args = call.arguments();
         devLogger.d("method: " + call.method);
+        int templateId;
+        String eventId;
         switch (call.method) {
             case Method.GET_PLATFORM_VERSION:
                 result.success("Android " + android.os.Build.VERSION.RELEASE);
@@ -108,7 +121,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                 getDeviceInfo(result);
                 break;
             case Method.FETCH_INBOX_MESSAGE:
-                int templateId = args != null && args.size() > 0 ? (Integer) args.get(0) : -1;
+                templateId = args != null && args.size() > 0 ? (Integer) args.get(0) : -1;
                 fetchInboxMessage(templateId, result);
                 break;
             case Method.FETCH_INBOX_MESSAGES:
@@ -145,18 +158,31 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             case Method.REMOVE_BADGE_NUMBER:
                 removeBadgeNumber(result);
                 break;
+            case Method.INAPP_MARK_AS_READ:
+                if(args==null || args.size()<2)
+                    return;
+                templateId=Integer.parseInt(args.get(0).toString());
+                eventId=args.get(1).toString();
+                inAppMarkAsRead(templateId,eventId,result);
+                break;
+            case Method.INAPP_MARK_AS_UNREAD:
+                if(args==null || args.size()<2)
+                    return;
+                templateId=Integer.parseInt(args.get(0).toString());
+                eventId=args.get(1).toString();
+                inAppMarkAsUnRead(templateId,eventId,result);
+                break;
+            case Method.INAPP_MARK_AS_DELETED:
+                if(args==null || args.size()<2)
+                    return;
+                templateId=Integer.parseInt(args.get(0).toString());
+                eventId=args.get(1).toString();
+                inAppMarkAsDeleted(templateId,eventId,result);
+                break;
             default:
                 result.notImplemented();
                 break;
         }
-    }
-
-    @Override
-    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        devLogger.d("detached from engine");
-        channel.setMethodCallHandler(null);
-        EventEmitter.getInstance().detachChannel();
-        application = null;
     }
 
     private void engage(List<Object> args, @NonNull Result result) {
@@ -174,7 +200,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             Appoxee.instance().addInitListener(onInitCompletedListener);
             Appoxee.instance().setReceiver(PushBroadcastReceiver.class);
         } catch (Exception e) {
-            result.error("engage", e.getMessage(), null);
+            result.error(Method.ENGAGE, e.getMessage(), null);
         }
     }
 
@@ -188,7 +214,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             String alias = Appoxee.instance().getAlias();
             result.success(alias);
         } catch (Exception e) {
-            result.error("getDeviceAlias", e.getMessage(), null);
+            result.error(Method.GET_DEVICE_ALIAS, e.getMessage(), null);
         }
     }
 
@@ -197,7 +223,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             boolean isPushEnabled = Appoxee.instance().isPushEnabled();
             result.success(isPushEnabled);
         } catch (Exception e) {
-            result.error("isPushEnabled", e.getMessage(), null);
+            result.error(Method.IS_PUSH_ENABLED, e.getMessage(), null);
         }
     }
 
@@ -207,10 +233,10 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             if (status == RequestStatus.SUCCESS) {
                 result.success(true);
             } else {
-                result.error("setPushEnabled", "Error getting push enabled state", null);
+                result.error(Method.OPT_IN, "Error getting push enabled state", null);
             }
         } catch (Exception e) {
-            result.error("setPushEnabled", e.getMessage(), null);
+            result.error(Method.OPT_IN, e.getMessage(), null);
         }
     }
 
@@ -219,7 +245,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             Appoxee.instance().triggerInApp(activity, event);
             result.success("");
         } catch (Exception e) {
-            result.error("isReady", e.getMessage(), null);
+            result.error(Method.IS_READY, e.getMessage(), null);
         }
     }
 
@@ -228,7 +254,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             boolean isReady = Appoxee.instance().isReady();
             result.success(isReady);
         } catch (Exception e) {
-            result.error("isReady", e.getMessage(), null);
+            result.error(Method.IS_READY, e.getMessage(), null);
         }
     }
 
@@ -238,19 +264,19 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             if (deviceInfo != null) {
                 result.success(MappSerializer.deviceInfoToMap(deviceInfo));
             } else {
-                result.error("getDeviceInfo", "Can't get device info!", null);
+                result.error(Method.GET_DEVICE_INFO, "Can't get device info!", null);
             }
         } catch (Exception e) {
-            result.error("getDeviceInfo", e.getMessage(), null);
+            result.error(Method.GET_DEVICE_INFO, e.getMessage(), null);
         }
     }
 
-    private void fetchInboxMessage(int template, @NonNull Result result) {
+    private void fetchInboxMessage(int templateId, @NonNull Result result) {
         try {
-            Appoxee.instance().fetchInboxMessage(activity, template);
+            Appoxee.instance().fetchInboxMessage(activity, templateId);
             handleInAppInboxMessages(result);
         } catch (Exception e) {
-            result.error("fetchInboxMessage", e.getMessage(), null);
+            result.error(Method.FETCH_INBOX_MESSAGE, e.getMessage(), null);
         }
     }
 
@@ -259,7 +285,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             Appoxee.instance().fetchInboxMessages(activity);
             handleInAppInboxMessages(result);
         } catch (Exception e) {
-            result.error("fetchInboxMessages", e.getMessage(), null);
+            result.error(Method.FETCH_INBOX_MESSAGES, e.getMessage(), null);
         }
     }
 
@@ -267,7 +293,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         try {
             Appoxee.instance().getFcmToken(result::success);
         } catch (Exception e) {
-            result.error("getFcmToken", e.getMessage(), null);
+            result.error(Method.GET_FCM_TOKEN, e.getMessage(), null);
         }
     }
 
@@ -276,7 +302,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             Appoxee.instance().setToken(token);
             result.success(token);
         } catch (Exception e) {
-            result.error("setToken", e.getMessage(), null);
+            result.error(Method.SET_TOKEN, e.getMessage(), null);
         }
     }
 
@@ -284,7 +310,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         try {
             Appoxee.instance().startGeoFencing(result::success);
         } catch (Exception e) {
-            result.error("startGeoFencing", e.getMessage(), null);
+            result.error(Method.START_GEOFENCING, e.getMessage(), null);
         }
     }
 
@@ -292,7 +318,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         try {
             Appoxee.instance().stopGeoFencing(result::success);
         } catch (Exception e) {
-            result.error("stopGeoFencing", e.getMessage(), null);
+            result.error(Method.STOP_GEOFENCING, e.getMessage(), null);
         }
     }
 
@@ -302,10 +328,10 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             if (status == RequestStatus.SUCCESS) {
                 result.success(tag);
             } else {
-                result.error("addTag", "Error adding TAG!", null);
+                result.error(Method.ADD_TAG, "Error adding TAG!", null);
             }
         } catch (Exception e) {
-            result.error("addTag", e.getMessage(), null);
+            result.error(Method.ADD_TAG, e.getMessage(), null);
         }
     }
 
@@ -314,7 +340,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             Set<String> tags = Appoxee.instance().getTags();
             result.success(tags);
         } catch (Exception e) {
-            result.error("getTag", e.getMessage(), null);
+            result.error(Method.FETCH_DEVICE_TAGS, e.getMessage(), null);
         }
     }
 
@@ -323,7 +349,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             Appoxee.instance().logOut(pushEnabled);
             result.success("logged out with 'PushEnabled' status: " + pushEnabled);
         } catch (Exception e) {
-            result.error("logOut", e.getMessage(), null);
+            result.error(Method.LOGOUT_WITH_OPT_IN, e.getMessage(), null);
         }
     }
 
@@ -332,7 +358,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             boolean isRegistered = Appoxee.instance().isDeviceRegistered();
             result.success(isRegistered);
         } catch (Exception e) {
-            result.error("isDeviceRegistered", e.getMessage(), null);
+            result.error(Method.IS_DEVICE_REGISTERED, e.getMessage(), null);
         }
     }
 
@@ -340,13 +366,38 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         Appoxee.removeBadgeNumber(application.getApplicationContext());
     }
 
-//    private void setRemoteMessage(RemoteMessage remoteMessage, @NonNull Result result) {
-//        try {
-//            Appoxee.instance().setRemoteMessage(remoteMessage);
-//        } catch (Exception e) {
-//            result.error("", e.getMessage(), null);
-//        }
-//    }
+    public void inAppMarkAsRead(Integer templateId, String eventId, @NonNull Result result) {
+        try {
+            Appoxee.instance().triggerStatistcs(activity, getInAppStatisticsRequestObject(templateId,
+                    eventId,
+                    InAppStatistics.INBOX_INBOX_MESSAGE_READ_KEY, null, null, null));
+            result.success(true);
+        } catch (Exception e) {
+            result.error(Method.INAPP_MARK_AS_READ, e.getMessage(),null);
+        }
+    }
+
+    public void inAppMarkAsUnRead(Integer templateId, String eventId, @NonNull Result result) {
+        try {
+            Appoxee.instance().triggerStatistcs(activity, getInAppStatisticsRequestObject(templateId,
+                    eventId,
+                    InAppStatistics.INBOX_INBOX_MESSAGE_UNREAD_KEY, null, null, null));
+            result.success(true);
+        } catch (Exception e) {
+            result.error(Method.INAPP_MARK_AS_UNREAD, e.getMessage(),null);
+        }
+    }
+
+    public void inAppMarkAsDeleted(Integer templateId, String eventId, @NonNull Result result) {
+        try {
+            Appoxee.instance().triggerStatistcs(activity, getInAppStatisticsRequestObject(templateId,
+                    eventId,
+                    InAppStatistics.INBOX_INBOX_MESSAGE_DELETED_KEY, null, null, null));
+            result.success(true);
+        } catch (Exception e) {
+            result.error(Method.INAPP_MARK_AS_DELETED, e.getMessage(),null);
+        }
+    }
 
     private AppoxeeOptions.Server getServerByIndex(int index) {
         if (index < 0 || index > AppoxeeOptions.Server.values().length) {
@@ -392,7 +443,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        devLogger.d("reattached to activity on config changes: "+binding.getActivity());
+        devLogger.d("reattached to activity on config changes: " + binding.getActivity());
         this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
     }

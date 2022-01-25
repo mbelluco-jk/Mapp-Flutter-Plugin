@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/services.dart';
 
 import 'helper_classes.dart';
+import 'method.dart';
 
 class MappSdk {
   // static const MethodChannel _channel = MethodChannel('mapp_sdk');
@@ -37,37 +39,37 @@ class MappSdk {
       print(call.method);
 
       switch (call.method) {
-        case 'didReceiveDeepLinkWithIdentifier':
+        case Method.DID_RECEIVE_DEEP_LINK_WITH_IDENTIFIER:
           didReceiveDeepLinkWithIdentifier(call.arguments);
           break;
-        case 'didReceiveInappMessageWithIdentifier':
+        case Method.DID_RECEIVE_INAPP_MESSAGE_WITH_IDENTIFIER:
           didReceiveInappMessageWithIdentifier(call.arguments);
           break;
-        case 'didReceiveCustomLinkWithIdentifier':
+        case Method.DID_RECEIVE_CUSTOM_LINK_WITH_IDENTIFIER:
           didReceiveCustomLinkWithIdentifier(call.arguments);
           break;
-        case 'didReceiveInBoxMessages':
+        case Method.DID_RECEIVE_INBOX_MESSAGE:
           didReceiveInBoxMessages(call.arguments);
           break;
-        case 'inAppCallFailedWithResponse':
+        case Method.INAPP_CALL_FAILED_WITH_RESPONSE:
           inAppCallFailedWithResponse(call.arguments);
           break;
-        case 'didReceiveInBoxMessage':
+        case Method.DID_RECEIVE_INBOX_MESSAGE:
           didReceiveInBoxMessage(call.arguments);
           break;
-        case 'handledRemoteNotification':
+        case Method.HANDLED_REMOTE_NOTIFICATION:
           handledRemoteNotification(call.arguments);
           break;
-        case 'handledRichContent':
+        case Method.HANDLED_RICH_CONTENT:
           handledRichContent(call.arguments);
           break;
-        case 'handledPushOpen':
+        case Method.HANDLED_PUSH_OPEN:
           handledPushOpen(call.arguments);
           break;
-        case 'handledPushDismiss':
+        case Method.HANDLED_PUSH_DISMISS:
           handledPushDismiss(call.arguments);
           break;
-        case 'handledPushSilent':
+        case Method.HANDLED_PUSH_SILENT:
           handledPushSilent(call.arguments);
           break;
         default:
@@ -80,88 +82,106 @@ class MappSdk {
   }
 
   static Future<String> get platformVersion async {
-    String? version = await _channel.invokeMethod('getPlatformVersion');
+    String? version = await _channel.invokeMethod(Method.GET_PLATFORM_VERSION);
     return version ?? "unknown";
   }
 
   static Future<String?> engage(String sdkKey, String googleProjectId,
       SERVER server, String appID, String tenantID) async {
-    final String? version = await _channel.invokeMethod(
-        'engage', [sdkKey, googleProjectId, server.index, appID, tenantID]);
+    final String? version = await _channel.invokeMethod(Method.ENGAGE,
+        [sdkKey, googleProjectId, server.index, appID, tenantID]);
     return 'successfull $version engage method invoked';
   }
 
   static Future<String?> postponeNotificationRequest(bool postpone) async {
-    final String? version =
-        await _channel.invokeMethod('postponeNotificationRequest', [postpone]);
+    final String? version = await _channel
+        .invokeMethod(Method.POSTPONE_NOTIFICATION_REQUEST, [postpone]);
     return 'successfull $version postponeNotificationRequest method invoked';
   }
 
   static Future<String?> showNotificationsOnForeground(
       bool showNotification) async {
-    final String? version = await _channel
-        .invokeMethod('showNotificationsOnForeground', [showNotification]);
+    final String? version = await _channel.invokeMethod(
+        Method.SHOW_NOTIFICATION_ON_FOREGROUND, [showNotification]);
     return 'successfull $version postponeNotificationRequest method invoked';
   }
 
   static Future<bool> isReady() async {
-    final bool version = await _channel.invokeMethod('isReady');
-    return version;
+    final bool ready = await _channel.invokeMethod(Method.IS_READY);
+    return ready;
   }
 
   static Future<String?> setPushEnabled(bool optIn) async {
-    final bool isPushEnabled = await _channel.invokeMethod('optIn', [optIn]);
+    final bool isPushEnabled =
+        await _channel.invokeMethod(Method.OPT_IN, [optIn]);
     return 'OptIn set to: $isPushEnabled opted in device with value $optIn';
   }
 
   static Future<bool> isPushEnabled() async {
-    final bool version = await _channel.invokeMethod('isPushEnabled');
+    final bool version = await _channel.invokeMethod(Method.IS_PUSH_ENABLED);
     return version;
   }
 
   static Future<String?> logOut(bool pushEnabled) async {
     final String? result =
-        await _channel.invokeMethod('logoutWithOptin', [pushEnabled]);
+        await _channel.invokeMethod(Method.LOGOUT_WITH_OPT_IN, [pushEnabled]);
     return result;
   }
 
   static Future<String?> setAlias(String alias) async {
     final String? version =
-        await _channel.invokeMethod('setDeviceAlias', [alias]);
+        await _channel.invokeMethod(Method.SET_ALIAS, [alias]);
     return version;
   }
 
   static Future<String> getAlias() async {
-    final String alias = await _channel.invokeMethod('getDeviceAlias');
+    final String alias = await _channel.invokeMethod(Method.GET_ALIAS);
     return alias;
   }
 
   static Future<Map<String, dynamic>?> getDeviceInfo() async {
     final Map<String, dynamic>? deviceInfo =
-        await _channel.invokeMapMethod<String, dynamic>('getDeviceInfo');
+        await _channel.invokeMapMethod<String, dynamic>(Method.GET_DEVICE_INFO);
     return deviceInfo;
   }
 
   static Future<String?> removeBadgeNumber() async {
-    final String deviceInfo = await _channel.invokeMethod('removeBadgeNumber');
+    final String deviceInfo =
+        await _channel.invokeMethod(Method.REMOVE_BADGE_NUMBER);
     return deviceInfo;
   }
 
   //InApp methods
   static Future<String?> triggerInApp(String value) async {
     final String returnValue =
-        await _channel.invokeMethod('triggerInApp', [value]);
+        await _channel.invokeMethod(Method.TRIGGER_INAPP, [value]);
     return returnValue;
   }
 
   static Future<dynamic> fetchInboxMessage() async {
-    final String returnValue = await _channel.invokeMethod('fetchInboxMessage');
+    final String returnValue =
+        await _channel.invokeMethod(Method.FETCH_INBOX_MESSAGES);
     return returnValue;
   }
 
   static Future<String?> fetchInBoxMessageWithMessageId(int value) async {
-    final String returnValue =
-        await _channel.invokeMethod('fetchInBoxMessageWithMessageId', [value]);
+    final String returnValue = await _channel
+        .invokeMethod(Method.FETCH_INBOX_MESSAGES_WITH_ID, [value]);
     return returnValue;
+  }
+
+  static Future<bool> inAppMarkAsRead(String templateId, String eventId) async {
+    return await _channel
+        .invokeMethod(Method.INAPP_MARK_AS_READ, [templateId, eventId]);
+  }
+
+  static Future<bool> inAppMarkAsUnread(String templateId, String eventId) async {
+    return await _channel
+        .invokeMethod(Method.INAPP_MARK_AS_UNREAD, [templateId, eventId]);
+  }
+
+  static Future<bool> inAppMarkAsDeleted(String templateId, String eventId) async {
+    return await _channel
+        .invokeMethod(Method.INAPP_MARK_AS_DELETED, [templateId, eventId]);
   }
 }
