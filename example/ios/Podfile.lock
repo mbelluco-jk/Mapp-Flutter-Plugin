@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - mapp_sdk (0.0.2):
+  - mapp_sdk (0.0.3):
     - Flutter
     - MappSDK (= 6.0.5.1)
     - MappSDKInapp (= 6.0.6.8)
@@ -24,10 +24,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  mapp_sdk: 16f42eeff7f6ef3828a36de11ba9b539c119c7cd
+  mapp_sdk: 6e03afc183e5795553be6cd8d7b5fabdd1b8ac60
   MappSDK: ec94b044904abf01c79ea37ddac084a81a8a088e
   MappSDKInapp: b4f1792aed4f3806ddf6701d4fdaaf0850864871
 
 PODFILE CHECKSUM: a5ead389ae8478b2f010fbadad4f103eae9ff09f
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.10.1

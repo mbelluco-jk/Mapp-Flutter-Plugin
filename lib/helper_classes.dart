@@ -7,6 +7,11 @@ class Config{
   static const String tenantID="60211";
   static const server=SERVER.EMC_US;
 
-  static final defaultConfig=[Config.sdkKey, Config.googleProjectId, Config.server, Config.appID, Config.tenantID];
+  static final defaultConfig = [
+    Config.sdkKey,
+    Config.googleProjectId,
+    Config.server,
+    Config.appID,
+    Config.tenantID
+  ];
 }
-

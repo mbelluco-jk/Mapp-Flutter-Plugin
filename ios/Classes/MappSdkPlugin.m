@@ -23,13 +23,16 @@ static FlutterMethodChannel *channel;
   if ([@"getPlatformVersion" isEqualToString:call.method]) {
     result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
   } else if ([@"engage" isEqualToString:call.method]){
-    NSNumber* severNumber = call.arguments[2];
-    InAppMessageDelegate* inAppMessageDelegate = [[InAppMessageDelegate alloc] initWith:channel];
+    NSNumber* serverNumber = call.arguments[2];
+    NSLog(@"server: %@", serverNumber);
+    [[InAppMessageDelegate sharedObject] initWith:channel];
+    [[InAppMessageDelegate sharedObject] addNotificationListeners];
     [[PushMessageDelegate sharedObject] initWith:channel];
     [[PushMessageDelegate sharedObject] addNotificationListeners];
-    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:(id)[PushMessageDelegate sharedObject] with:severNumber];
-    [inAppMessageDelegate addNotificationListeners];
-    [[AppoxeeInapp shared] engageWithDelegate:inAppMessageDelegate with:severNumber];
+    SERVER serv = [self getServerKeyFor:serverNumber];
+    [[Appoxee shared] engageAndAutoIntegrateWithLaunchOptions:NULL andDelegate:(id)[PushMessageDelegate sharedObject] with:serv];
+    INAPPSERVER inappServ = [self getInappServerKeyFor: serverNumber];
+    [[AppoxeeInapp shared] engageWithDelegate:(id)[InAppMessageDelegate sharedObject] with:inappServ];
   } else if ([@"postponeNotificationRequest" isEqualToString:call.method]){
     NSNumber *value = call.arguments[0];
     [[Appoxee shared] setPostponeNotificationRequest:[value boolValue]];
@@ -167,6 +170,50 @@ static FlutterMethodChannel *channel;
         return [self topViewController:presented];
     }
     return base;
+}
+
+- (SERVER)getServerKeyFor: (NSNumber *) name {
+    if ([name intValue] == 0) {
+        return L3;
+    }
+    if ( [name intValue] == 2) {
+        return EMC;
+    }
+    if ( [name intValue] == 3) {
+        return EMC_US;
+    }
+    if ( [name intValue] == 4) {
+        return CROC;
+    }
+    if ([name intValue] == 5) {
+        return TEST;
+    }
+    if ([name intValue] == 6) {
+        return TEST55;
+    }
+    return TEST;
+}
+
+- (INAPPSERVER) getInappServerKeyFor: (NSNumber *) name {
+    if ([name intValue] == 0) {
+        return l3;
+    }
+    if ( [name intValue] == 2) {
+        return eMC;
+    }
+    if ( [name intValue] == 3) {
+        return eMC_US;
+    }
+    if ( [name intValue] == 4) {
+        return cROC;
+    }
+    if ([name intValue] == 5) {
+        return tEST;
+    }
+    if ([name intValue] == 6) {
+        return tEST55;
+    }
+    return tEST;
 }
 
 @end
