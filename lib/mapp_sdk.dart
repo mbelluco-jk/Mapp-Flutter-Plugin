@@ -48,7 +48,7 @@ class MappSdk {
         case Method.DID_RECEIVE_CUSTOM_LINK_WITH_IDENTIFIER:
           didReceiveCustomLinkWithIdentifier(call.arguments);
           break;
-        case Method.DID_RECEIVE_INBOX_MESSAGE:
+        case Method.DID_RECEIVE_INBOX_MESSAGES:
           didReceiveInBoxMessages(call.arguments);
           break;
         case Method.INAPP_CALL_FAILED_WITH_RESPONSE:

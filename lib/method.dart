@@ -27,6 +27,7 @@ class Method {
 
   static const INAPP_CALL_FAILED_WITH_RESPONSE = 'inAppCallFailedWithResponse';
   static const DID_RECEIVE_INBOX_MESSAGE = 'didReceiveInBoxMessage';
+  static const DID_RECEIVE_INBOX_MESSAGES = 'didReceiveInBoxMessages';
   static const HANDLED_REMOTE_NOTIFICATION = 'handledRemoteNotification';
   static const HANDLED_RICH_CONTENT = 'handledRichContent';
   static const HANDLED_PUSH_OPEN = 'handledPushOpen';
