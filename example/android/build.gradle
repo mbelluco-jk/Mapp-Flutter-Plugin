@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         google()
-        mavenLocal()
+        //mavenLocal()
         mavenCentral()
         maven { url "https://maven.google.com/"}    }
 
@@ -13,7 +13,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        mavenLocal()
+       // mavenLocal()
         mavenCentral()
         maven { url "https://maven.google.com/"}    }
 }

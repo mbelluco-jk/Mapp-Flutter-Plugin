@@ -9,6 +9,14 @@ import 'package:mapp_sdk_example/deep_link_page.dart';
 import 'package:mapp_sdk/mapp_sdk.dart';
 import 'package:mapp_sdk/helper_classes.dart';
 
+class Config{
+  static const String sdkKey="1816b634b0c62a.20197038";
+  static const String appID="300861";
+  static const String googleProjectId="785651527831";
+  static const String tenantID="33";
+  static const SERVER server = SERVER.TEST;
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
