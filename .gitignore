@@ -30,3 +30,4 @@ doc/api/
 /android/.idea/.name
 /android/.idea/gradle.xml
 /android/.idea/misc.xml
+.idea/libraries/
