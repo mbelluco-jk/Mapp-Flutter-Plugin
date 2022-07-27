@@ -1,6 +1,7 @@
 #import "MappSdkPlugin.h"
 #import "PushMessageDelegate.h"
 #import "InAppMessageDelegate.h"
+#import "AppoxeeLocationManager.h"
 
 static FlutterMethodChannel *channel;
 
@@ -136,6 +137,13 @@ static FlutterMethodChannel *channel;
     NSNumber * messageId = call.arguments[0];
     [[AppoxeeInapp shared] fetchInBoxMessageWithMessageId:[messageId stringValue]];
     NSLog(@"This is fetchInBoxMessageWithMessageId");
+  } else if ([@"startGeofencing" isEqualToString:call.method]){
+    [[AppoxeeLocationManager shared] setLogLevel:1];
+    [[AppoxeeLocationManager shared] enableLocationMonitoring];
+    NSLog(@"GeoFencing started!");
+  } else if ([@"stopGeofencing" isEqualToString:call.method]){
+    [[AppoxeeLocationManager shared] disableLocationMonitoring];
+    NSLog(@"Geofencing stopped!");
   } else {
     result(FlutterMethodNotImplemented);
   }

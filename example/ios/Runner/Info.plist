@@ -49,5 +49,15 @@
 	<false/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Need this for silent push messages</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>NSLocationUsageDescription</key>
+	<string>Please allow us to use location for geofencing purpose.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow us to use location for geofencing purpose</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Allow us to use location for geofencing purpose.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allow us to use location for geofencing purpose.</string>
 </dict>
 </plist>

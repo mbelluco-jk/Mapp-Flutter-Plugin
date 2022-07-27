@@ -37,4 +37,8 @@ class Method {
   static const INAPP_MARK_AS_READ = 'inAppMarkAsRead';
   static const INAPP_MARK_AS_UNREAD = 'inAppMarkAsUnread';
   static const INAPP_MARK_AS_DELETED = 'inAppMarkAsDeleted';
+
+  //geotargeting
+  static const START_GEOFENCING = 'startGeofencing';
+  static const STOP_GEOFENCING = 'stopGeofencing';
 }

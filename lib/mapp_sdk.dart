@@ -175,13 +175,25 @@ class MappSdk {
         .invokeMethod(Method.INAPP_MARK_AS_READ, [templateId, eventId]);
   }
 
-  static Future<bool> inAppMarkAsUnread(String templateId, String eventId) async {
+  static Future<bool> inAppMarkAsUnread(
+      String templateId, String eventId) async {
     return await _channel
         .invokeMethod(Method.INAPP_MARK_AS_UNREAD, [templateId, eventId]);
   }
 
-  static Future<bool> inAppMarkAsDeleted(String templateId, String eventId) async {
+  static Future<bool> inAppMarkAsDeleted(
+      String templateId, String eventId) async {
     return await _channel
         .invokeMethod(Method.INAPP_MARK_AS_DELETED, [templateId, eventId]);
+  }
+
+  //geotargeting
+
+  static Future<void> startGeoFencing() async {
+    await _channel.invokeMethod(Method.START_GEOFENCING);
+  }
+
+  static Future<void> stopGeoFencing() async {
+    await _channel.invokeMethod(Method.STOP_GEOFENCING);
   }
 }

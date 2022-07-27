@@ -9,12 +9,12 @@ import 'package:mapp_sdk_example/deep_link_page.dart';
 import 'package:mapp_sdk/mapp_sdk.dart';
 import 'package:mapp_sdk/helper_classes.dart';
 
-class Config{
-  static const String sdkKey="1816b634b0c62a.20197038";
-  static const String appID="300861";
-  static const String googleProjectId="785651527831";
-  static const String tenantID="33";
-  static const SERVER server = SERVER.TEST;
+class Config {
+  static const String sdkKey = "1816b634b0c62a.20197038";
+  static const String appID = "300861";
+  static const String googleProjectId = "785651527831";
+  static const String tenantID = "33";
+  static const SERVER server = SERVER.L3;
 }
 
 class HomePage extends StatefulWidget {
@@ -143,7 +143,9 @@ class _HomePageState extends State<HomePage> {
         "Lock Orientation",
         "Engage",
         "Log out",
-        "Log out (& optOut)"
+        "Log out (& optOut)",
+        "Start Geo",
+        "Stop Geo"
       ];
     });
   }
@@ -266,6 +268,10 @@ class _HomePageState extends State<HomePage> {
       MappSdk.triggerInApp("app_discount");
     } else if (_screens[index] == "In App: App Promo") {
       MappSdk.triggerInApp("app_promo");
+    } else if (_screens[index] == "Start Geo") {
+      MappSdk.startGeoFencing();
+    } else if (_screens[index] == "Stop Geo") {
+      MappSdk.stopGeoFencing();
     }
   }
 
