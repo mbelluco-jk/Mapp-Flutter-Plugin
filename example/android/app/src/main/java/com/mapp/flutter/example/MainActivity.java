@@ -9,8 +9,9 @@ import androidx.annotation.Nullable;
 import com.mapp.flutter.sdk.MappSdkPlugin;
 
 import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.android.FlutterFragmentActivity;
 
-public class MainActivity extends FlutterActivity {
+public class MainActivity extends FlutterFragmentActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -5,18 +5,24 @@ import static com.appoxee.internal.ui.UiUtils.getInAppStatisticsRequestObject;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
 import com.appoxee.Appoxee;
 import com.appoxee.AppoxeeOptions;
 import com.appoxee.DeviceInfo;
 import com.appoxee.RequestStatus;
+import com.appoxee.internal.geo.geofencing.GeofenceStatus;
 import com.appoxee.internal.inapp.model.APXInboxMessage;
 import com.appoxee.internal.inapp.model.InAppInboxCallback;
 import com.appoxee.internal.inapp.model.InAppStatistics;
 import com.appoxee.internal.logger.Logger;
 import com.appoxee.internal.logger.LoggerFactory;
+import com.appoxee.internal.permission.GeofencePermissions;
+import com.appoxee.internal.permission.GeofencingPermissionsCallback;
 import com.appoxee.push.NotificationMode;
 
 import org.json.JSONArray;
@@ -36,6 +42,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 /**
  * MappSdkPlugin
  */
+@SuppressWarnings("Convert2MethodRef")
 public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
 
     public static final String ENGINE_ID = "MappSdkPluggin";
@@ -51,6 +58,50 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private Result result;
 
     private final Logger devLogger = LoggerFactory.getDevLogger();
+
+    private GeofencePermissions geofencePermissions;
+
+    private final GeofencingPermissionsCallback geofencingPermissionsCallback = new GeofencingPermissionsCallback() {
+        @Override
+        public void onGranted() {
+            Appoxee.instance().startGeoFencing(res -> {
+                result.success(res);
+            });
+        }
+
+        @Override
+        public void onPermissionsNotGranted(List<String> permissions) {
+            if (result != null) {
+                result.success(GeofenceStatus.GEOFENCE_LOCATION_PERMISSIONS_NOT_GRANTED);
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Permissions not granted");
+            builder.setMessage("Following permissions are required: \n" + TextUtils.join(", ", permissions.toArray()) +
+                    "\nDo you want to allow requested permissions?");
+            builder.setPositiveButton("OK", (dialog, position) -> {
+                geofencePermissions.requestPermissions();
+            });
+            builder.setNegativeButton("Cancel", null);
+            builder.create().show();
+        }
+
+        @Override
+        public void onPermanentlyDeniedPermissions(List<String> permissions) {
+            if (result != null) {
+                result.success(GeofenceStatus.GEOFENCE_LOCATION_PERMISSIONS_NOT_GRANTED);
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Permissions permanently denied");
+            builder.setMessage("Following permissions are required: \n" + TextUtils.join(", ", permissions.toArray()) +
+                    "\nDo you want to open system settings and manually grant required permissions?");
+            builder.setPositiveButton("OK", (dialog, position) -> {
+                geofencePermissions.openPermissionSettings();
+            });
+            builder.setNegativeButton("Cancel", null);
+            builder.create().show();
+        }
+    };
+
 
     private final Appoxee.OnInitCompletedListener onInitCompletedListener = new Appoxee.OnInitCompletedListener() {
         @Override
@@ -159,25 +210,25 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                 removeBadgeNumber(result);
                 break;
             case Method.INAPP_MARK_AS_READ:
-                if(args==null || args.size()<2)
+                if (args == null || args.size() < 2)
                     return;
-                templateId=Integer.parseInt(args.get(0).toString());
-                eventId=args.get(1).toString();
-                inAppMarkAsRead(templateId,eventId,result);
+                templateId = Integer.parseInt(args.get(0).toString());
+                eventId = args.get(1).toString();
+                inAppMarkAsRead(templateId, eventId, result);
                 break;
             case Method.INAPP_MARK_AS_UNREAD:
-                if(args==null || args.size()<2)
+                if (args == null || args.size() < 2)
                     return;
-                templateId=Integer.parseInt(args.get(0).toString());
-                eventId=args.get(1).toString();
-                inAppMarkAsUnRead(templateId,eventId,result);
+                templateId = Integer.parseInt(args.get(0).toString());
+                eventId = args.get(1).toString();
+                inAppMarkAsUnRead(templateId, eventId, result);
                 break;
             case Method.INAPP_MARK_AS_DELETED:
-                if(args==null || args.size()<2)
+                if (args == null || args.size() < 2)
                     return;
-                templateId=Integer.parseInt(args.get(0).toString());
-                eventId=args.get(1).toString();
-                inAppMarkAsDeleted(templateId,eventId,result);
+                templateId = Integer.parseInt(args.get(0).toString());
+                eventId = args.get(1).toString();
+                inAppMarkAsDeleted(templateId, eventId, result);
                 break;
             default:
                 result.notImplemented();
@@ -308,7 +359,8 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     private void startGeoFencing(@NonNull Result result) {
         try {
-            Appoxee.instance().startGeoFencing(result::success);
+            this.result = result;
+            geofencePermissions.requestPermissions();
         } catch (Exception e) {
             result.error(Method.START_GEOFENCING, e.getMessage(), null);
         }
@@ -316,7 +368,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
 
     private void stopGeoFencing(@NonNull Result result) {
         try {
-            Appoxee.instance().stopGeoFencing(result::success);
+            Appoxee.instance().stopGeoFencing(resString -> result.success(resString));
         } catch (Exception e) {
             result.error(Method.STOP_GEOFENCING, e.getMessage(), null);
         }
@@ -373,7 +425,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                     InAppStatistics.INBOX_INBOX_MESSAGE_READ_KEY, null, null, null));
             result.success(true);
         } catch (Exception e) {
-            result.error(Method.INAPP_MARK_AS_READ, e.getMessage(),null);
+            result.error(Method.INAPP_MARK_AS_READ, e.getMessage(), null);
         }
     }
 
@@ -384,7 +436,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                     InAppStatistics.INBOX_INBOX_MESSAGE_UNREAD_KEY, null, null, null));
             result.success(true);
         } catch (Exception e) {
-            result.error(Method.INAPP_MARK_AS_UNREAD, e.getMessage(),null);
+            result.error(Method.INAPP_MARK_AS_UNREAD, e.getMessage(), null);
         }
     }
 
@@ -395,7 +447,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                     InAppStatistics.INBOX_INBOX_MESSAGE_DELETED_KEY, null, null, null));
             result.success(true);
         } catch (Exception e) {
-            result.error(Method.INAPP_MARK_AS_DELETED, e.getMessage(),null);
+            result.error(Method.INAPP_MARK_AS_DELETED, e.getMessage(), null);
         }
     }
 
@@ -432,6 +484,8 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         devLogger.d("attached to activity");
         this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
+        this.geofencePermissions = new GeofencePermissions((FragmentActivity) activity, geofencingPermissionsCallback);
+
     }
 
     @Override
@@ -439,6 +493,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         devLogger.d("detached from activity for config changes: " + (activity != null ? activity.getClass().getName() : "null"));
         this.activity = null;
         this.channel.setMethodCallHandler(null);
+        this.geofencePermissions = null;
     }
 
     @Override
@@ -446,6 +501,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         devLogger.d("reattached to activity on config changes: " + binding.getActivity());
         this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
+        this.geofencePermissions = new GeofencePermissions((FragmentActivity) activity, geofencingPermissionsCallback);
     }
 
     @Override
@@ -453,6 +509,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         devLogger.d("detached from activity: " + (activity != null ? activity.getClass().getName() : "null"));
         this.activity = null;
         this.channel.setMethodCallHandler(null);
+        this.geofencePermissions = null;
     }
 
     public static void handleIntent(Activity activity, Intent intent) {

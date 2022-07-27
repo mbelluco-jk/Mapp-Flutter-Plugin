@@ -189,11 +189,11 @@ class MappSdk {
 
   //geotargeting
 
-  static Future<void> startGeoFencing() async {
-    await _channel.invokeMethod(Method.START_GEOFENCING);
+  static Future<String> startGeoFencing() async {
+    return await _channel.invokeMethod(Method.START_GEOFENCING);
   }
 
-  static Future<void> stopGeoFencing() async {
-    await _channel.invokeMethod(Method.STOP_GEOFENCING);
+  static Future<String> stopGeoFencing() async {
+    return await _channel.invokeMethod(Method.STOP_GEOFENCING);
   }
 }

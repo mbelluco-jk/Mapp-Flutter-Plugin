@@ -10,11 +10,11 @@ import 'package:mapp_sdk/mapp_sdk.dart';
 import 'package:mapp_sdk/helper_classes.dart';
 
 class Config {
-  static const String sdkKey = "1816b634b0c62a.20197038";
-  static const String appID = "300861";
+  static const String sdkKey = "1823e87491862e.90223284";
+  static const String appID = "300875";
   static const String googleProjectId = "785651527831";
-  static const String tenantID = "33";
-  static const SERVER server = SERVER.L3;
+  static const String tenantID = "55";
+  static const SERVER server = SERVER.TEST;
 }
 
 class HomePage extends StatefulWidget {
@@ -269,9 +269,21 @@ class _HomePageState extends State<HomePage> {
     } else if (_screens[index] == "In App: App Promo") {
       MappSdk.triggerInApp("app_promo");
     } else if (_screens[index] == "Start Geo") {
-      MappSdk.startGeoFencing();
+      MappSdk.startGeoFencing().then((status) {
+        debugPrint("Start Geofencing status:" + status);
+        _showMyDialog("Start Geofencing", "", status);
+      }).catchError((e) {
+        debugPrint("Start Geofencing error:" + e.toString());
+        _showMyDialog("Start Geofencing", "", e.to);
+      });
     } else if (_screens[index] == "Stop Geo") {
-      MappSdk.stopGeoFencing();
+      MappSdk.stopGeoFencing().then((status) {
+        debugPrint("Stop Geofencing status:" + status);
+        _showMyDialog("Stop Geofencing", "", status);
+      }).catchError((e) {
+        debugPrint("Stop Geofencing error:" + e.toString());
+        _showMyDialog("Stop Geofencing", "", e.toString());
+      });
     }
   }
 
