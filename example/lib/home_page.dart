@@ -14,7 +14,7 @@ class Config {
   static const String appID = "300875";
   static const String googleProjectId = "785651527831";
   static const String tenantID = "55";
-  static const SERVER server = SERVER.TEST;
+  static const SERVER server = SERVER.L3;
 }
 
 class HomePage extends StatefulWidget {
@@ -132,8 +132,6 @@ class _HomePageState extends State<HomePage> {
         "Is Push Enabled",
         "Opt in",
         "Opt out",
-        "Start Geo",
-        "Stop Geo",
         "Fetch inbox messages",
         "In App: App Open",
         "In App: App Feedback",

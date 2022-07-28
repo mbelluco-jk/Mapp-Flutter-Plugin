@@ -141,9 +141,11 @@ static FlutterMethodChannel *channel;
     [[AppoxeeLocationManager shared] setLogLevel:1];
     [[AppoxeeLocationManager shared] enableLocationMonitoring];
     NSLog(@"GeoFencing started!");
+    result(@"GEOFENCES_STARTED_OK");
   } else if ([@"stopGeofencing" isEqualToString:call.method]){
     [[AppoxeeLocationManager shared] disableLocationMonitoring];
     NSLog(@"Geofencing stopped!");
+    result(@"GEOFENCES_STOPPED_OK");
   } else {
     result(FlutterMethodNotImplemented);
   }
