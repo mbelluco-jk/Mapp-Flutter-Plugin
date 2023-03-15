@@ -10,10 +10,10 @@ import 'package:mapp_sdk/mapp_sdk.dart';
 import 'package:mapp_sdk/helper_classes.dart';
 
 class Config {
-  static const String sdkKey = "1823e87491862e.90223284";
-  static const String appID = "300875";
+  static const String sdkKey = "183408d0cd3632.83592719";
+  static const String appID = "206974";
   static const String googleProjectId = "785651527831";
-  static const String tenantID = "55";
+  static const String tenantID = "5963";
   static const SERVER server = SERVER.L3;
 }
 

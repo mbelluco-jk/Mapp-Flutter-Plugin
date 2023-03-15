@@ -1,6 +1,6 @@
 name: mapp_sdk
 description: Mapp SDK plugin enables the usage of Mapp Engage platform, such as push notifications and InApp messages segmented sendout.
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/MappCloud/Mapp-Flutter-Plugin
 
 environment:
@@ -14,7 +14,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.1
 
 false_secrets:
   - /android/google-services.json

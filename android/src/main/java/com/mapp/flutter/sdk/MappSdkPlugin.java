@@ -241,7 +241,6 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             //[sdkKey, googleProjectId, server.index, appID, tenantID]
             AppoxeeOptions options = new AppoxeeOptions();
             options.sdkKey = (String) args.get(0);
-            options.googleProjectId = (String) args.get(1);
             options.server = getServerByIndex((Integer) args.get(2));
             options.appID = (String) args.get(3);
             options.tenantID = (String) args.get(4);
