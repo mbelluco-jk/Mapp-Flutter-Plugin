@@ -25,4 +25,6 @@ public interface Method {
     String INAPP_MARK_AS_READ = "inAppMarkAsRead";
     String INAPP_MARK_AS_UNREAD = "inAppMarkAsUnread";
     String INAPP_MARK_AS_DELETED = "inAppMarkAsDeleted";
+
+    String PERSMISSION_REQUEST_POST_NOTIFICATION="requestPermissionPostNotification";
 }

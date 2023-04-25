@@ -17,6 +17,14 @@ class Config {
   static const SERVER server = SERVER.L3;
 }
 
+// class Config {
+//   static const String sdkKey = "187b8432cc7644.91361308";
+//   static const String appID = "207036";
+//   static const String googleProjectId = "498892612269";
+//   static const String tenantID = "5915";
+//   static const SERVER server = SERVER.L3;
+// }
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -25,7 +33,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? _platformVersion = 'Unknown';
   String? _aliasToSetString = '';
   String? _tagToSetString = '';
   String? _tagToRemoveString = '';
@@ -37,12 +44,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    debugPrint("initState()");
     super.initState();
 
-    MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
-        Config.appID, Config.tenantID);
+    initMappSdk();
+  }
 
-    initPlatformState();
+  void initMappSdk() async {
+    debugPrint("initMappSdk()");
+    await MappSdk.engage(Config.sdkKey, Config.googleProjectId, Config.server,
+        Config.appID, Config.tenantID);
+    await initPlatformState();
+    await requestPermissionPostNotifications();
   }
 
   void didReceiveDeepLinkWithIdentifierHandler(dynamic arguments) {
@@ -108,22 +121,12 @@ class _HomePageState extends State<HomePage> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String? platformVersion;
-
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await MappSdk.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
     setState(() {
-      _platformVersion = platformVersion;
       _screens = [
         "Set Device Alias Text",
         "Set Device Alias",
@@ -146,6 +149,19 @@ class _HomePageState extends State<HomePage> {
         "Stop Geo"
       ];
     });
+  }
+
+  Future<void> requestPermissionPostNotifications() async {
+    try {
+      final result = await MappSdk.requestPermissionPostNotifications();
+      debugPrint("POST NOTIFICATION PERMISSION RESULT: " + result.toString());
+      if (!result) {
+        _showMyDialog(
+            "POST NOTIFICATION", "Permission result", "Permission was denied!");
+      }
+    } on PlatformException catch (e) {
+      _showMyDialog("POST NOTIFICATION", e.code, e.message?.toString() ?? "Unknown error");
+    }
   }
 
   Future<void> _showMyDialog(String title, String subtitle, String text) async {

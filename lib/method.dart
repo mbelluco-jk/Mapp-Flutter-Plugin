@@ -43,4 +43,6 @@ class Method {
   //geotargeting
   static const START_GEOFENCING = 'startGeofencing';
   static const STOP_GEOFENCING = 'stopGeofencing';
+  static const PERSMISSION_REQUEST_POST_NOTIFICATION =
+      "requestPermissionPostNotification";
 }

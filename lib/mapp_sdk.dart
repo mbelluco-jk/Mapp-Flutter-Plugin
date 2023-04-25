@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -36,7 +37,7 @@ class MappSdk {
 
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
-    debugPrint(call.method);
+      debugPrint(call.method);
 
       switch (call.method) {
         case Method.DID_RECEIVE_DEEP_LINK_WITH_IDENTIFIER:
@@ -88,8 +89,8 @@ class MappSdk {
 
   static Future<String?> engage(String sdkKey, String googleProjectId,
       SERVER server, String appID, String tenantID) async {
-    final String? version = await _channel.invokeMethod(Method.ENGAGE,
-        [sdkKey, "", server.index, appID, tenantID]);
+    final String? version = await _channel.invokeMethod(
+        Method.ENGAGE, [sdkKey, "", server.index, appID, tenantID]);
     return 'successfull $version engage method invoked';
   }
 
@@ -195,5 +196,11 @@ class MappSdk {
 
   static Future<String> stopGeoFencing() async {
     return await _channel.invokeMethod(Method.STOP_GEOFENCING);
+  }
+
+  /// Only for Android - Request permission to post notifications, for Android 13 and higher
+  static Future<bool> requestPermissionPostNotifications() async {
+    return await _channel
+        .invokeMethod(Method.PERSMISSION_REQUEST_POST_NOTIFICATION);
   }
 }

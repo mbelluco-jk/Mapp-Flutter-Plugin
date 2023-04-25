@@ -2,12 +2,19 @@ package com.mapp.flutter.sdk;
 
 import static com.appoxee.internal.ui.UiUtils.getInAppStatisticsRequestObject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.text.TextUtils;
+import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
@@ -23,12 +30,15 @@ import com.appoxee.internal.logger.Logger;
 import com.appoxee.internal.logger.LoggerFactory;
 import com.appoxee.internal.permission.GeofencePermissions;
 import com.appoxee.internal.permission.GeofencingPermissionsCallback;
+import com.appoxee.internal.permission.PermissionsCallback;
 import com.appoxee.push.NotificationMode;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -38,15 +48,22 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry;
 
 /**
  * MappSdkPlugin
  */
 @SuppressWarnings("Convert2MethodRef")
-public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler {
+public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
     public static final String ENGINE_ID = "MappSdkPluggin";
     public static final String MAPP_CHANNEL_NAME = "mapp_sdk";
+
+    private static final int POST_NOTIFICATION_PERMISSION_REQUEST_CODE = 190;
+
+    private static final String REQUESTED_PERMISSIONS_KEY = "requested_permissions";
+
+    private static final String SHARED_PREFS_FILE_NAME = "mapp_engage_flutter_plugin_prefs";
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
@@ -60,6 +77,8 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private final Logger devLogger = LoggerFactory.getDevLogger();
 
     private GeofencePermissions geofencePermissions;
+
+    private SharedPreferences sharedPrefs;
 
     private final GeofencingPermissionsCallback geofencingPermissionsCallback = new GeofencingPermissionsCallback() {
         @Override
@@ -106,16 +125,12 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
     private final Appoxee.OnInitCompletedListener onInitCompletedListener = new Appoxee.OnInitCompletedListener() {
         @Override
         public void onInitCompleted(boolean successful, Exception failReason) {
-            if (result != null) {
-                if (successful) {
-                    Appoxee.instance().getDeviceInfoDMC();
-                    DeviceInfo info = Appoxee.instance().getDeviceInfo();
-                    devLogger.d("DEVICE INFO: " + info);
-                    result.success(info.sdkVersion);
-                }
-                if (failReason != null) {
-                    result.error("engage", failReason.getMessage(), null);
-                }
+            if (successful) {
+                DeviceInfo info = Appoxee.instance().getDeviceInfo();
+                devLogger.d("DEVICE INFO: " + info);
+            }
+            if (failReason != null) {
+                devLogger.e("engage", failReason.getMessage(), null);
             }
         }
     };
@@ -126,6 +141,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         application = (Application) flutterPluginBinding.getApplicationContext();
         channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), MAPP_CHANNEL_NAME);
         EventEmitter.getInstance().attachChannel(channel);
+        sharedPrefs = application.getApplicationContext().getSharedPreferences(SHARED_PREFS_FILE_NAME, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -230,6 +246,10 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
                 eventId = args.get(1).toString();
                 inAppMarkAsDeleted(templateId, eventId, result);
                 break;
+            case Method.PERSMISSION_REQUEST_POST_NOTIFICATION:
+                this.result = result;
+                requestPermissionPostNotification();
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -249,6 +269,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
             this.result = result;
             Appoxee.instance().addInitListener(onInitCompletedListener);
             Appoxee.instance().setReceiver(PushBroadcastReceiver.class);
+            result.success("OK");
         } catch (Exception e) {
             result.error(Method.ENGAGE, e.getMessage(), null);
         }
@@ -484,7 +505,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
         this.geofencePermissions = new GeofencePermissions((FragmentActivity) activity, geofencingPermissionsCallback);
-
+        binding.addRequestPermissionsResultListener(this);
     }
 
     @Override
@@ -501,6 +522,7 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         this.activity = binding.getActivity();
         this.channel.setMethodCallHandler(this);
         this.geofencePermissions = new GeofencePermissions((FragmentActivity) activity, geofencingPermissionsCallback);
+        binding.addRequestPermissionsResultListener(this);
     }
 
     @Override
@@ -519,4 +541,62 @@ public class MappSdkPlugin implements FlutterPlugin, ActivityAware, MethodCallHa
         }
     }
 
+    private void requestPermissionPostNotification() {
+        // check permission only for Android 13 and higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            //check if permission already granted
+            if (activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                // if granted, set result to true
+                result.success(true);
+            } else {
+                Set<String> existingPermissions = sharedPrefs.getStringSet(REQUESTED_PERMISSIONS_KEY, new ArraySet<>());
+                if (activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) ||
+                        !existingPermissions.contains(Manifest.permission.POST_NOTIFICATIONS)) {
+                    Set<String> set = new ArraySet<>(existingPermissions);
+                    set.add(Manifest.permission.POST_NOTIFICATIONS);
+                    sharedPrefs.edit().putStringSet("requested_permissions", set).apply();
+                    activity.requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_PERMISSION_REQUEST_CODE);
+                } else {
+                    result.error("PERMISSION_PERMANENTLY_DENIED", "Permission is permanently denied. Go to system settings and enable Notification permission", null);
+                }
+            }
+        } else {
+            // For Android bellow version 13, set notification permission as enabled.
+            result.success(true);
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private void resolvePostNotificationPermissionResult() {
+        // check if permission is denied
+        if (activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_DENIED) {
+            // if permission is denied we need to check if permission rationale should be shown;
+            // it rationale should be shown, we can request permission once again
+            if (activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                activity.requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, POST_NOTIFICATION_PERMISSION_REQUEST_CODE);
+            } else {
+                // when permission was denied and rationale should not be shown, then permission is permanently denied;
+                // in that case, app can't request permission and only way to handle this is to open application system settings;
+                // in this case, we only send error and leave opening the system settings to the client application
+                result.error("PERMISSION_PERMANENTLY_DENIED", "Permission is permanently denied. Go to system settings and enable Notification permission", null);
+            }
+        }
+    }
+
+    @Override
+    public boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == POST_NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            for (int i = 0; i < permissions.length; i++) {
+                String p = permissions[i];
+                int grantResult = grantResults[i];
+                if (Objects.equals(p, Manifest.permission.POST_NOTIFICATIONS)) {
+                    result.success(grantResult == PackageManager.PERMISSION_GRANTED);
+                    return true;
+                }
+            }
+            result.success(false);
+            return true;
+        } else
+            return false;
+    }
 }
