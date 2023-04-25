@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import 'helper_classes.dart';
 import 'method.dart';
@@ -36,7 +36,7 @@ class MappSdk {
 
   static Future<void> _platformCallHandler(MethodCall call) {
     try {
-      print(call.method);
+    debugPrint(call.method);
 
       switch (call.method) {
         case Method.DID_RECEIVE_DEEP_LINK_WITH_IDENTIFIER:
@@ -73,10 +73,10 @@ class MappSdk {
           handledPushSilent(call.arguments);
           break;
         default:
-          print('Unknowm method ${call.method} ');
+          debugPrint('Unknowm method ${call.method} ');
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
     return Future.value();
   }

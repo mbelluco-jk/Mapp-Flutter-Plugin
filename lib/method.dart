@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 class Method {
   static const GET_PLATFORM_VERSION = 'getPlatformVersion';
   static const IS_READY = 'isReady';

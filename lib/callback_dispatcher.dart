@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void callbackDispatcher() {
-  const MethodChannel _backgroundChannel = MethodChannel('mapp_sdk');
+  const MethodChannel backgroundChannel = MethodChannel('mapp_sdk');
   WidgetsFlutterBinding.ensureInitialized();
 
-  _backgroundChannel.setMethodCallHandler((MethodCall call) async {
+  backgroundChannel.setMethodCallHandler((MethodCall call) async {
     final List<dynamic> args = call.arguments;
     final Function? callbackThis = PluginUtilities.getCallbackFromHandle(
         CallbackHandle.fromRawHandle(args[0]));
