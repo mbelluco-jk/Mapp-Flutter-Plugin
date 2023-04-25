@@ -21,7 +21,7 @@ class Config {
 //   static const String sdkKey = "187b8432cc7644.91361308";
 //   static const String appID = "207036";
 //   static const String googleProjectId = "498892612269";
-//   static const String tenantID = "5915";
+//   static const String tenantID = "5963";
 //   static const SERVER server = SERVER.L3;
 // }
 
