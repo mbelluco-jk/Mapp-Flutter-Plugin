@@ -1,3 +1,6 @@
+## 0.0.8
+* Changes to pubspec list so the plugin now can work on flutter apps which are using swift for iOS part.
+
 ## 0.0.7
 * Added method to request runtime permission for POST_NOTIFICATION from a plugin.
 

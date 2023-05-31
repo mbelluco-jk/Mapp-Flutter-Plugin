@@ -3,6 +3,7 @@
 
 #import "PushMessageDelegate.h"
 #import <UIKit/UIKit.h>
+#import "AppoxeeSDK.h"
 
 @interface PushMessageDelegate() <AppoxeeDelegate, UIApplicationDelegate>
 

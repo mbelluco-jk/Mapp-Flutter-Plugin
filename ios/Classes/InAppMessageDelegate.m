@@ -2,6 +2,7 @@
 //
 
 #import "InAppMessageDelegate.h"
+#import "AppoxeeInappSDK.h"
 
 @interface InAppMessageDelegate() <AppoxeeInappDelegate>
 

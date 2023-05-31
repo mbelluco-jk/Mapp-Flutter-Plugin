@@ -2,6 +2,8 @@
 #import "PushMessageDelegate.h"
 #import "InAppMessageDelegate.h"
 #import "AppoxeeLocationManager.h"
+#import "AppoxeeInappSDK.h"
+#import "AppoxeeSDK.h"
 
 static FlutterMethodChannel *channel;
 
